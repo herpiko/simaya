@@ -436,20 +436,30 @@ module.exports = function(app) {
       reason : ""
     }
 
-    var validateOutgoing = function(callback) {
+    var validateOutgoing = function(data, callback) {
       _.each(["date", "sender", "title", "classification", "priority", "type", "comments"], function(item) {
         if (!data[item]) {
-          success = false;
-          fields.push(item);
+          validateResult.success = false;
+          validateResult.fields.push(item);
+        } else {
+          if (data[item]=="mailId") {
+            db.findOne({mailId : data.mailId}, function(err, r){
+              if (r) {
+                validateResult.success = false;
+                validateResult.fields.push("mailId");
+                validateResult.reason = "Nomor surat sudah pernah digunakan";
+              }
+            });
+          }
         }
       });
 
       var recipientsDb, recipientsManual;
       if (data["recipients"]) {
-        validateResult.recipientsDb = true;
+        recipientsDb = true;
       }
       if (data["recipientManual"]) {
-        validateResult.recipientsManual = true;
+        recipientsManual = true;
       }
 
       if (recipientsDb == false && recipientsManual == false) {
@@ -465,62 +475,78 @@ module.exports = function(app) {
       callback(validateResult);
     }
 
-    var validateManualOutgoing = function(callback) {
-      db.findOne({mailId : data.mailId}, function(err, r){
-        if (r) {
+    var validateManualOutgoing = function(data, callback) {
+      _.each(["date", "outgoingAgenda", "mailId", "recipientManual", "title", "classification", "priority", "type", "sender", "comments"], function(item) {
+        if (!data[item]) {
           validateResult.success = false;
-          validateResult.fields.push("mailId");
-          validateResult.reason = "Nomor surat sudah pernah digunakan";
+          validateResult.fields.push(item);
         } else {
-          _.each(["date", "outgoingAgenda", "mailId", "recipientManual", "title", "classification", "priority", "type", "sender", "comments"], function(item) {
-            if (!data[item]) {
-              validateResult.success = false;
-              validateResult.fields.push(item);
-            }
-          });
-
-          _.each(["date"], function(item) {
-            data[item] = new Date(data[item]);
-            if (data[item] && isNaN(data[item].valueOf())) {
-              validateResult.success = false;
-              validateResult.fields.push(item);
-            }
-          });
-        }
-        callback(validateResult);
-      });
-    }
-
-    var validateManualIncoming = function(callback) {
-      db.findOne({mailId : data.mailId}, function(err, r){
-        if (r) {
-          validateResult.success = false;
-          validateResult.fields.push("mailId");
-          validateResult.reason = "Nomor surat sudah pernah digunakan";
-        } else {
-          _.each(["receivedDate", "date", "incomingAgenda", "mailId", "recipient", "title", "classification", "priority", "type" ], function(item) {
-            if (!data[item]) {
-              validateResult.success = false;
-              validateResult.fields.push(item);
-            }
-          });
-
-          _.each(["date", "receivedDate"], function(item) {
-            data[item] = new Date(data[item]);
-            if (data[item] && isNaN(data[item].valueOf())) {
-              validateResult.success = false;
-              validateResult.fields.push(item);
-            }
-          });
-
-          if (!data.sender && !data.senderManual) {
-            validateResult.success = false;
-            validateResult.fields.push("sender");
-            validateResult.fields.push("senderManual");
+          if (data[item]=="mailId") {
+            db.findOne({mailId : data.mailId}, function(err, r){
+              if (r) {
+                validateResult.success = false;
+                validateResult.fields.push("mailId");
+                validateResult.reason = "Nomor surat sudah pernah digunakan";
+              }
+            });
           }
         }
-        callback(validateResult);
+      })
+      _.each(["date"], function(item) {
+        data[item] = new Date(data[item]);
+        if (data[item] && isNaN(data[item].valueOf())) {
+          validateResult.success = false;
+          validateResult.fields.push(item);
+        }
       });
+      callback(validateResult);
+    }
+
+    var validateManualIncoming = function(data, callback) {
+      _.each(["receivedDate", "date", "incomingAgenda", "mailId", "recipient", "title", "classification", "priority", "type" ], function(item) {
+        if (!data[item]) {
+          validateResult.success = false;
+          validateResult.fields.push(item);
+        /*} else {
+          if (data[item]=="mailId") {
+            db.findOne({mailId : data.mailId}, function(err, r){
+              if (r) {
+                validateResult.success = false;
+                validateResult.fields.push("mailId");
+                validateResult.reason = "Nomor surat sudah pernah digunakan";
+              }
+            });
+          }*/
+        }
+      })
+      _.each(["date", "receivedDate"], function(item) {
+        data[item] = new Date(data[item]);
+        if (data[item] && isNaN(data[item].valueOf())) {
+          validateResult.success = false;
+          validateResult.fields.push(item);
+        }
+      })
+      if (!data.sender && !data.senderManual) {
+        validateResult.success = false;
+        validateResult.fields.push("sender");
+        validateResult.fields.push("senderManual");
+      }
+      var isMailIdExist = function(validateResult, cb){
+        db.findOne({mailId : data.mailId}, function(err, r){
+          if (r) {
+            validateResult.success = false;
+            validateResult.fields.push("mailId");
+            validateResult.reason = "Nomor surat sudah pernah digunakan";
+            console.log(validateResult.success+" "+validateResult.reason);
+          }
+          cb(validateResult);
+        });
+      }
+
+      console.log("saat callback "+validateResult.success+" "+validateResult.reason);
+
+      isMailIdExist(validateResult, function(validateResult){callback(validateResult)});
+
     }
     var returnValidateResult = function(validateResult){
       return cb({
@@ -537,11 +563,11 @@ module.exports = function(app) {
       });
     } else {
       if (data.operation == "manual-incoming") {
-        validateManualIncoming(returnValidateResult);
+        validateManualIncoming(data, returnValidateResult);
       } else if (data.operation == "manual-outgoing") {
-        validateManualOutgoing(returnValidateResult);
+        validateManualOutgoing(data, returnValidateResult);
       } else if (data.operation == "outgoing") {
-        validateOutgoing(returnValidateResult);
+        validateOutgoing(data, returnValidateResult);
       }
     }
   };
