@@ -441,16 +441,6 @@ module.exports = function(app) {
         if (!data[item]) {
           validateResult.success = false;
           validateResult.fields.push(item);
-        } else {
-          if (data[item]=="mailId") {
-            db.findOne({mailId : data.mailId}, function(err, r){
-              if (r) {
-                validateResult.success = false;
-                validateResult.fields.push("mailId");
-                validateResult.reason = "Nomor surat sudah pernah digunakan";
-              }
-            });
-          }
         }
       });
 
@@ -480,16 +470,6 @@ module.exports = function(app) {
         if (!data[item]) {
           validateResult.success = false;
           validateResult.fields.push(item);
-        } else {
-          if (data[item]=="mailId") {
-            db.findOne({mailId : data.mailId}, function(err, r){
-              if (r) {
-                validateResult.success = false;
-                validateResult.fields.push("mailId");
-                validateResult.reason = "Nomor surat sudah pernah digunakan";
-              }
-            });
-          }
         }
       })
       _.each(["date"], function(item) {
@@ -507,16 +487,6 @@ module.exports = function(app) {
         if (!data[item]) {
           validateResult.success = false;
           validateResult.fields.push(item);
-        /*} else {
-          if (data[item]=="mailId") {
-            db.findOne({mailId : data.mailId}, function(err, r){
-              if (r) {
-                validateResult.success = false;
-                validateResult.fields.push("mailId");
-                validateResult.reason = "Nomor surat sudah pernah digunakan";
-              }
-            });
-          }*/
         }
       })
       _.each(["date", "receivedDate"], function(item) {
@@ -537,18 +507,17 @@ module.exports = function(app) {
             validateResult.success = false;
             validateResult.fields.push("mailId");
             validateResult.reason = "Nomor surat sudah pernah digunakan";
-            console.log(validateResult.success+" "+validateResult.reason);
+            console.log(JSON.stringify(r));
           }
           cb(validateResult);
         });
       }
 
-      console.log("saat callback "+validateResult.success+" "+validateResult.reason);
-
       isMailIdExist(validateResult, function(validateResult){callback(validateResult)});
 
     }
     var returnValidateResult = function(validateResult){
+      console.log("Kembalikan hasil validasi... "+JSON.stringify(validateResult)+" ".green);
       return cb({
         success: validateResult.success,
         fields: validateResult.fields,
