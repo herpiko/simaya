@@ -427,13 +427,26 @@ module.exports = function(app) {
 
   // Validates data when edit
   var validateForEdit = function(data, cb) {
-
     //var success = true;
     //var fields = [];
     var validateResult = {
       success : true,
       fields : [],
       reason : ""
+    }
+
+    var isMailIdExist = function(validateResult, cb){
+      console.log("Validasi nomor surat ganda");
+      db.findOne({mailId : data.mailId}, function(err, r){
+        if (r) {
+          validateResult.success = false;
+          validateResult.fields.push("mailId");
+          validateResult.reason = "Nomor surat sudah pernah digunakan";
+          console.log("Validasi gagal. Item yang sudah ada = mailId: "+r.mailId+" comments: "+r.comments);
+          console.log("Validasi gagal. Item baru = mailId: "+data.mailId+" comments: "+data.comments);
+        }
+        cb(validateResult);
+      });
     }
 
     var validateOutgoing = function(data, callback) {
@@ -501,17 +514,6 @@ module.exports = function(app) {
         validateResult.fields.push("sender");
         validateResult.fields.push("senderManual");
       }
-      var isMailIdExist = function(validateResult, cb){
-        db.findOne({mailId : data.mailId}, function(err, r){
-          if (r) {
-            validateResult.success = false;
-            validateResult.fields.push("mailId");
-            validateResult.reason = "Nomor surat sudah pernah digunakan";
-            console.log(JSON.stringify(r));
-          }
-          cb(validateResult);
-        });
-      }
 
       isMailIdExist(validateResult, function(validateResult){callback(validateResult)});
 
@@ -537,6 +539,8 @@ module.exports = function(app) {
         validateManualOutgoing(data, returnValidateResult);
       } else if (data.operation == "outgoing") {
         validateOutgoing(data, returnValidateResult);
+      } else {
+        returnValidateResult(validateResult);
       }
     }
   };
@@ -2760,8 +2764,10 @@ module.exports = function(app) {
       }
       validateForEdit(data, function(result) {
         if (result.success) {
+          console.log("Mestinya ini setelah validasi");
           prepareDataFunc(data, function(preparedData) {
             edit(preparedData, cb);
+            console.log("prepared data "+JSON.stringify(preparedData));
           });
         } else {
           cb(new Error(), result);
