@@ -349,7 +349,7 @@ describe("Letter", function() {
       operation: "manual-incoming",
       date: new Date,
       receivedDate: new Date,
-      mailId: "123",
+      mailId: "1234",
       incomingAgenda: "A123",
       recipient: "a",
       ccList: "a1,b1",
@@ -489,6 +489,25 @@ describe("Letter", function() {
           record[0].fileAttachments.should.have.length(1);
           record[0].should.have.property("ccList");
           record[0].ccList.should.have.length(2);
+          done();
+        });
+      }
+
+      letter.createLetter({originator:"tu.a", sender: "tu.a", creationDate: new Date}, check);
+    });
+
+    it ("should fail on duplicated data : mailId", function(done) {
+      var check = function(err, data) {
+        var d = _.clone(letterData[0]);
+        d.receivedDate = new Date("a");
+        //first attempt
+        letter.editLetter({_id: data[0]._id}, d, function(err, data) {});
+        letter.editLetter({_id: data[0]._id}, d, function(err, data) {
+          should(err).be.ok;
+          data.should.have.property("success");
+          data.should.have.property("fields");
+          data.success.should.not.be.ok;
+          data.fields.should.containEql("mailId");
           done();
         });
       }
