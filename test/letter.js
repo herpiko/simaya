@@ -3,17 +3,16 @@ var _ = require("lodash");
 var chance = require("chance").Chance(9); // use exactly same seed for deterministic tests
 var path = require("path");
 var os = require("os");
-var utils = require(__dirname + "/../helper/utils");
+var utils = require(__dirname + "/utils");
 var letter = require(__dirname + "/../simaya/models/letter.js")(utils.app);
 var notification = require(__dirname + "/../simaya/models/notification.js")(utils.app);
-var user = utils.app.db("user"); 
-var orgDb = utils.app.db("organization"); 
+var user = utils.app.db("user");
+var orgDb = utils.app.db("organization");
 var fs = require("fs");
 var async = require("async");
-
 function bulkInsert(counter, callback) {
   user.insert({
-    username: "user" + counter, 
+    username: "user" + counter,
     profile: {
       organization: "org" + counter
     }
@@ -36,12 +35,12 @@ var clearOrg = function(cb) {
 
 
 var clearLetter = function(cb) {
-  var l = utils.app.db("letter"); 
+  var l = utils.app.db("letter");
   l.remove({}, {j:false}, cb);
 }
 
 var clearNotification  = function(cb) {
-  var l = utils.app.db("notification"); 
+  var l = utils.app.db("notification");
   l.remove({}, {j:false}, cb);
 }
 
@@ -85,11 +84,11 @@ var saveAttachment = function(data, cb) {
   var selector = {_id: data._id};
   letter.saveAttachmentFile(file, function(err, r0) {
     should(err).not.be.ok;
-    
+
     var selector = {_id: data._id};
     file.path = r0.fileId;
 
-    letter.addFileAttachment(selector, file, function(err) { 
+    letter.addFileAttachment(selector, file, function(err) {
       should(err).not.be.ok;
       letter.editLetter(selector, data, function(err, r1) {
         should(err).not.be.ok;
@@ -110,13 +109,14 @@ var saveAttachment = function(data, cb) {
         });
 
         letter.downloadAttachment({
-          id:file.path, 
+          id:file.path,
           stream:stream
         }, done);
       });
     });
   });
 }
+
 
 describe("Letter structure", function() {
   var orgs = [
@@ -173,7 +173,7 @@ var users = [
         setup();
       });
     }
- 
+
   });
 
   describe("Senders", function() {
@@ -325,12 +325,14 @@ describe("Letter", function() {
     });
   });
 
+  var randomMailId = function(){this.generate = Math.random().toString(36).substring(7);}
+  var randomAgenda = function(){this.generate = "A"+Math.random().toString(36).substring(7);}
+
   var letterData = [
     {
       operation: "manual-incoming",
       date: new Date,
       receivedDate: new Date,
-      mailId: "123",
       incomingAgenda: "A123",
       recipient: "a",
       senderManual: {
@@ -343,7 +345,7 @@ describe("Letter", function() {
       classification: "0",
       priority: "0",
       type: "11",
-      comments: "comments"
+      comments: "comments 0"
     },
     {
       operation: "manual-incoming",
@@ -363,7 +365,7 @@ describe("Letter", function() {
       classification: "0",
       priority: "0",
       type: "11",
-      comments: "comments"
+      comments: "comments 1"
     },
     {
       operation: "manual-outgoing",
@@ -383,7 +385,27 @@ describe("Letter", function() {
       classification: "0",
       priority: "0",
       type: "11",
-      comments: "comments"
+      comments: "comments 2"
+    },
+    {
+      operation: "manual-outgoing",
+      date: new Date,
+      receivedDate: new Date,
+      mailId: "123",
+      outgoingAgenda: "A123",
+      ccList: "",
+      sender: "a",
+      recipientManual: {
+        id: "id",
+        name: "omama",
+        organization: "org",
+        address: "address"
+      },
+      title: "title",
+      classification: "0",
+      priority: "0",
+      type: "11",
+      comments: "comments 3"
     },
     {
       operation: "manual-outgoing",
@@ -403,7 +425,7 @@ describe("Letter", function() {
       classification: "0",
       priority: "0",
       type: "11",
-      comments: "comments"
+      comments: "comments 4"
     },
 
   ];
@@ -413,6 +435,8 @@ describe("Letter", function() {
       var check = function(err, data) {
         var d = _.clone(letterData[0]);
         delete(d.senderManual);
+        d.mailId = new randomMailId().generate;
+        d.incomingAgenda = new randomAgenda().generate;
 
         letter.editLetter({_id: data[0]._id}, d, function(err, data) {
           should(err).be.ok;
@@ -431,6 +455,7 @@ describe("Letter", function() {
       var check = function(err, data) {
         var d = _.clone(letterData[0]);
         d.date = new Date("a");
+        d.mailId = new randomMailId().generate;
 
         letter.editLetter({_id: data[0]._id}, d, function(err, data) {
           should(err).be.ok;
@@ -449,6 +474,7 @@ describe("Letter", function() {
       var check = function(err, data) {
         var d = _.clone(letterData[0]);
         d.receivedDate = new Date("a");
+        d.mailId = new randomMailId().generate;
 
         letter.editLetter({_id: data[0]._id}, d, function(err, data) {
           should(err).be.ok;
@@ -467,6 +493,8 @@ describe("Letter", function() {
     it ("should create an incoming letter", function(done) {
       var check = function(err, data) {
         var d = _.clone(letterData[0]);
+        d.mailId = new randomMailId().generate;
+        d.incomingAgenda = new randomAgenda().generate;
         d._id = data[0]._id;
         saveAttachment(d, function(record) {
           record.should.have.length(1);
@@ -483,6 +511,8 @@ describe("Letter", function() {
       var check = function(err, data) {
         var d = _.clone(letterData[1]);
         d._id = data[0]._id;
+        d.mailId = new randomMailId().generate;
+        d.incomingAgenda = new randomAgenda().generate;
         saveAttachment(d, function(record) {
           record.should.have.length(1);
           record[0].should.have.property("fileAttachments");
@@ -495,12 +525,32 @@ describe("Letter", function() {
 
       letter.createLetter({originator:"tu.a", sender: "tu.a", creationDate: new Date}, check);
     });
+
+    it ("should fail on creating manual incoming with duplicated data : mailId & Agenda", function(done) {
+      var check = function(err, data) {
+        var d = _.clone(letterData[0]);
+        letter.editLetter({_id: data[0]._id}, d, function(err, data) {
+        });
+        letter.editLetter({_id: data[0]._id}, d, function(err, data) {
+          should(err).be.ok;
+          data.should.have.property("success");
+          data.should.have.property("fields");
+          data.success.should.not.be.ok;
+          data.fields.should.containEql("mailId");
+          done();
+        });
+
+      }
+
+      letter.createLetter({originator:"tu.a", sender: "tu.a", creationDate: new Date}, check);
+    });
   });
 
   describe("Letter[manual-outgoing]", function() {
     it ("should fail on incomplete data: recipientManual", function(done) {
       var check = function(err, data) {
         var d = _.clone(letterData[2]);
+        d.mailId = new randomMailId().generate;
         delete (d.recipientManual);
 
         letter.editLetter({_id: data[0]._id}, d, function(err, data) {
@@ -519,6 +569,7 @@ describe("Letter", function() {
     it ("should fail on invalid data: date", function(done) {
       var check = function(err, data) {
         var d = _.clone(letterData[2]);
+        d.mailId = new randomMailId().generate;
         d.date = new Date("a");
 
         letter.editLetter({_id: data[0]._id}, d, function(err, data) {
@@ -537,6 +588,7 @@ describe("Letter", function() {
     it ("should create a manual outgoing letter", function(done) {
       var check = function(err, data) {
         var d = _.clone(letterData[2]);
+        d.mailId = new randomMailId().generate;
         d._id = data[0]._id;
         saveAttachment(d, function(record) {
           record.should.have.length(1);
@@ -552,8 +604,10 @@ describe("Letter", function() {
 
     it ("should create a manual outgoing letter with cc", function(done) {
       var check = function(err, data) {
-        var d = _.clone(letterData[3]);
+        var d = _.clone(letterData[4]);
         d._id = data[0]._id;
+        d.mailId = new randomMailId().generate;
+        d.outgoingAgenda = new randomAgenda().generate;
         saveAttachment(d, function(record) {
           record.should.have.length(1);
           record[0].status.should.be.eql(letter.Stages.SENT);
@@ -568,6 +622,23 @@ describe("Letter", function() {
         });
       }
 
+      letter.createLetter({originator:"tu.a", sender: "tu.a", creationDate: new Date}, check);
+    });
+    it ("should fail on creating manual outgoing with duplicated data : mailId & Agenda", function(done) {
+      var check = function(err, data) {
+        var d = _.clone(letterData[0]);
+        letter.editLetter({_id: data[0]._id}, d, function(err, data) {
+        });
+        letter.editLetter({_id: data[0]._id}, d, function(err, data) {
+          should(err).be.ok;
+          data.should.have.property("success");
+          data.should.have.property("fields");
+          data.success.should.not.be.ok;
+          data.fields.should.containEql("mailId");
+          done();
+        });
+
+      }
       letter.createLetter({originator:"tu.a", sender: "tu.a", creationDate: new Date}, check);
     });
   });
@@ -645,7 +716,7 @@ describe("Letter Process", function() {
     it ("should return correct list", function(done) {
       letter.reviewerListByLetter(null, "c1", "a", function(data) {
         data.should.have.length(4);
-        var names = _.pluck(data, "username"); 
+        var names = _.pluck(data, "username");
         names.should.eql(["c", "b1", "a1", "a"]);
         done();
       });
@@ -654,7 +725,7 @@ describe("Letter Process", function() {
     it ("should also return correct list", function(done) {
       letter.reviewerListByLetter(null, "b", "a", function(data) {
         data.should.have.length(3);
-        var names = _.pluck(data, "username"); 
+        var names = _.pluck(data, "username");
         names.should.eql(["b1", "a1", "a"]);
         done();
       });
@@ -663,7 +734,7 @@ describe("Letter Process", function() {
     it ("should also return correct list again", function(done) {
       letter.reviewerListByLetter(null, "c1", "b", function(data) {
         data.should.have.length(3);
-        var names = _.pluck(data, "username"); 
+        var names = _.pluck(data, "username");
         names.should.eql(["c", "b1", "b"]);
         done();
       });
@@ -672,7 +743,7 @@ describe("Letter Process", function() {
     it ("should also return correct list again", function(done) {
       letter.reviewerListByLetter(null, "c", "b", function(data) {
         data.should.have.length(2);
-        var names = _.pluck(data, "username"); 
+        var names = _.pluck(data, "username");
         names.should.eql(["b1", "b"]);
         done();
       });
@@ -681,7 +752,7 @@ describe("Letter Process", function() {
     it ("should also return correct list again", function(done) {
       letter.reviewerListByLetter(null, "c1", "c1", function(data) {
         data.should.have.length(1);
-        var names = _.pluck(data, "username"); 
+        var names = _.pluck(data, "username");
         names.should.eql(["c"]);
         done();
       });
@@ -690,7 +761,7 @@ describe("Letter Process", function() {
     it ("should also return correct list", function(done) {
       letter.reviewerListByLetter(null, "b1", "b1", function(data) {
         data.should.have.length(1);
-        var names = _.pluck(data, "username"); 
+        var names = _.pluck(data, "username");
         names.should.eql(["b1"]);
         done();
       });
@@ -827,7 +898,7 @@ describe("Letter Process", function() {
       comments: "comments",
       body: "body"
     },
- 
+
   ];
 
   describe("Letter[outgoing]", function() {
@@ -944,7 +1015,7 @@ describe("Letter Process", function() {
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
         data[0].comments.should.be.eql("commented");
-        
+
         done();
       }
 
@@ -980,7 +1051,7 @@ describe("Letter Process", function() {
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
         data[0].title.should.be.eql("changed");
-        
+
         done();
       }
 
@@ -1051,7 +1122,7 @@ describe("Letter Process", function() {
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
         data[0].recipients.should.be.eql(["e"]);
-        
+
         done();
       }
 
@@ -1086,7 +1157,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(5);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
-        
+
         done();
       }
 
@@ -1151,7 +1222,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(6);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
-        
+
         done();
       }
 
@@ -1196,7 +1267,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(7);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
-        
+
         done();
       }
 
@@ -1220,7 +1291,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(8);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(3);
-        
+
         done();
       }
 
@@ -1387,7 +1458,7 @@ describe("Letter Process", function() {
         data[0].currentReviewer.should.be.eql("b1");
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
-        
+
         done();
       }
 
@@ -1419,7 +1490,7 @@ describe("Letter Process", function() {
         data[0].currentReviewer.should.be.eql("b1");
         data[0].should.have.property("status");
         data[0].status.should.be.eql(3);
-        
+
         done();
       }
 
@@ -1472,7 +1543,8 @@ describe("Letter Process", function() {
 
     it ("tu.b adds an attachment", function(done) {
       var data = {
-        _id: id
+        _id: id,
+        mailId: "123"
       }
       saveAttachment(data, function(record) {
         record.should.have.length(1);
@@ -1562,7 +1634,7 @@ describe("Letter Process", function() {
 
       letter.lastAgenda("A;B", 1, check);
     });
-        
+
     it ("should show last outgoing letter number of A;B", function(done) {
       var check = function(err, data) {
         data.should.eql("123");
@@ -1571,7 +1643,7 @@ describe("Letter Process", function() {
 
       letter.lastAgenda("A;B", 2, check);
     });
- 
+
     it ("should list notification for sender", function(done) {
       notification.get("b1", function(data) {
         data.should.have.length(8);
@@ -1649,7 +1721,7 @@ describe("Letter Process", function() {
         data[0].currentReviewer.should.be.eql("a1");
         data[0].should.have.property("status");
         data[0].status.should.be.eql(letter.Stages.REVIEWING);
-        
+
         done();
       }
 
@@ -1670,7 +1742,7 @@ describe("Letter Process", function() {
         data[0].currentReviewer.should.be.eql("a");
         data[0].should.have.property("status");
         data[0].status.should.be.eql(letter.Stages.REVIEWING);
-        
+
         done();
       }
 
@@ -1691,7 +1763,7 @@ describe("Letter Process", function() {
         data[0].currentReviewer.should.be.eql("a");
         data[0].should.have.property("status");
         data[0].status.should.be.eql(letter.Stages.APPROVED);
-        
+
         done();
       }
 
@@ -1855,7 +1927,7 @@ describe("Letter Process", function() {
         data[0].currentReviewer.should.be.eql("b1");
         data[0].should.have.property("status");
         data[0].status.should.be.eql(3);
-        
+
         done();
       }
 
@@ -2165,7 +2237,7 @@ describe("Letter Process", function() {
         data[0].currentReviewer.should.be.eql("b1");
         data[0].should.have.property("status");
         data[0].status.should.be.eql(3);
-        
+
         done();
       }
 
@@ -2484,7 +2556,7 @@ describe("Letter Process", function() {
         var r = data.data.readStates;
         r.should.have.property("others");
         r.others.should.have.property("d1");
-        
+
         done();
       }
 
@@ -2808,7 +2880,7 @@ describe("Letter Process", function() {
   });
 
   var ccId;
-  var letterDataSingle = 
+  var letterDataSingle =
     {
       operation: "outgoing",
       date: new Date,
@@ -2822,7 +2894,7 @@ describe("Letter Process", function() {
       comments: "comments"
     };
 
-  var letterDataNoApprovals = 
+  var letterDataNoApprovals =
     {
       operation: "outgoing",
       date: new Date,
@@ -2919,7 +2991,7 @@ describe("Letter Process", function() {
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
         data[0].comments.should.be.eql("commented");
-        
+
         done();
       }
 
@@ -2944,7 +3016,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(3);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
-        
+
         done();
       }
 
@@ -2968,7 +3040,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(4);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
-        
+
         done();
       }
 
@@ -2992,7 +3064,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(5);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
-        
+
         done();
       }
 
@@ -3016,7 +3088,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(6);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(3);
-        
+
         done();
       }
 
@@ -3069,7 +3141,7 @@ describe("Letter Process", function() {
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
         data[0].comments.should.be.eql("commented");
-        
+
         done();
       }
 
@@ -3094,7 +3166,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(3);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
-        
+
         done();
       }
 
@@ -3118,7 +3190,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(4);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
-        
+
         done();
       }
 
@@ -3142,7 +3214,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(5);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(2);
-        
+
         done();
       }
 
@@ -3166,7 +3238,7 @@ describe("Letter Process", function() {
         data[0].log.should.have.length(6);
         data[0].should.have.property("status");
         data[0].status.should.be.eql(3);
-        
+
         done();
       }
 
@@ -3274,7 +3346,7 @@ describe("Letter Process", function() {
         var r = data.data.readStates;
         r.should.have.property("recipients");
         r.recipients.should.have.property("daf1");
-        
+
         done();
       }
 
@@ -3443,7 +3515,7 @@ describe("Letter Process", function() {
         };
         letter.reviewLetter(id, "a1", "approved", data, fn);
       }
-      
+
       var approveB1 = function(id, fn) {
         var data = {
           message: "OK",
