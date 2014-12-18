@@ -263,11 +263,16 @@
           </ul><!--/.nav-list-->
 
           <div id="sidebar-collapse">
-            <i class="icon-double-angle-left"></i>
+            <i id="collapse" class="icon-double-angle-left"></i>
+            <i id="expand" class="icon-double-angle-right hidden"></i>
           </div>
 
           <script type="text/javascript">
-            try{ace.settings.check('sidebar' , 'collapsed')}catch(e){}
+              try{ace.settings.check('sidebar' , 'collapsed')}catch(e){}
+              $("#sidebar-collapse").click(function(){
+                $("#collapse").addClass("hidden");
+                $("#expand").removeClass("hidden");
+              });
           </script>
         </div>
 
