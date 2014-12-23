@@ -131,8 +131,10 @@ module.exports = function (app) {
                 vals.phones.push({ email: profile['phones'][i]})
               }
             }
-
-            utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+            category.list(function(categoryList) {
+              vals.userCategory = categoryList;
+              utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+            });
 
           } else {
             vals.successful = true;
@@ -157,7 +159,10 @@ module.exports = function (app) {
                 vals.form = true;
                 vals.username = "";
                 vals.profile = {};
-                utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+                category.list(function(categoryList) {
+                  vals.userCategory = categoryList;
+                  utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+                });
               }
             });
           }
@@ -194,7 +199,6 @@ module.exports = function (app) {
         res.redirect("/")
       }
     }
-    /* var isPolitical = (req.body.id === "000000000000000000"); */
     role.list(function(roleList) {
       vals.roleList = roleList;
       if (typeof(req.body) === "object" && Object.keys(req.body).length != 0) {
@@ -203,41 +207,51 @@ module.exports = function (app) {
 
         if (parseInt(req.body.profile.echelon) != 0) {
           if (req.body.profile.category && req.body.profile.id) {
-            // validate PNS's NIP
-            if (isLocalAdmin && req.body.profile.id.length != 18 && req.body.profile.category == "PNS") {
-              vals.unsuccessful = true;
-              vals.form = true;
-              vals.messages = vals.messages || []
-              vals.messages.push({message: 'NIP "' + req.body.profile.id + '" tidak sesuai. NIP harus 18 angka.'})
-              return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
-            } else if (isLocalAdmin && req.body.profile.category && !req.body.profile.id.length) {
-              vals.unsuccessful = true;
-              vals.form = true;
-              vals.messages = vals.messages || []
-              vals.messages.push({message: 'Nomor identitas harus diisi.'})
-              return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
-            }
-          } else {
-            
+            // validate idLength
+            category.list({categoryName:req.body.profile.category},function(cat) {
+              if (isLocalAdmin && req.body.profile.id.length != cat[0].idLength) {
+                vals.unsuccessful = true;
+                vals.form = true;
+                vals.messages = vals.messages || []
+                vals.messages.push({message: cat[0].categoryId+' "' + req.body.profile.id + '" tidak sesuai. '+cat[0].categoryId+' harus '+cat[0].idLength+' angka.'})
+                category.list(function(categoryList) {
+                  vals.userCategory = categoryList;
+                  return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+                });
+              // validate idLength must exist
+              } else if (isLocalAdmin && req.body.profile.category && !req.body.profile.id.length) {
+                vals.unsuccessful = true;
+                vals.form = true;
+                vals.messages = vals.messages || []
+                vals.messages.push({message: 'Nomor identitas harus diisi.'})
+                category.list(function(categoryList) {
+                  vals.userCategory = categoryList;
+                  return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+                });
+              } else {
+                user.list({ search: {'profile.id': req.body.profile.id, 'profile.category':req.body.profile.category}}, function (r) {
+                  if (isLocalAdmin && r[0] != null && parseInt(req.body.profile.echelon) != 0) {
+                    if (r[0].profile.id == req.body.profile.id && r[0].username != req.body.username) {
+                      vals.unsuccessful = true;
+                      vals.existNip = true;
+                      vals.form = true;
+                      vals.messages = vals.messages || []
+                      vals.messages.push({message: ' Nomor identitas "' + req.body.profile.id + '" sudah ada'})
+                      category.list(function(categoryList) {
+                        vals.userCategory = categoryList;
+                        return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+                      });
+                    } else {
+                      newUserReal(req, res, vals);
+                    }
+                  } else {
+                    newUserReal(req, res, vals);
+                  }
+                });
+              }
+            });
           }
         }
-
-        user.list({ search: {'profile.id': req.body.profile.id}}, function (r) {
-          if (isLocalAdmin && r[0] != null && parseInt(req.body.profile.echelon) != 0) {
-            if (r[0].profile.id == req.body.profile.id && r[0].username != req.body.username && req.body.profile.category == "PNS") {
-              vals.unsuccessful = true;
-              vals.existNip = true;
-              vals.form = true;
-              vals.messages = vals.messages || []
-              vals.messages.push({message: 'NIP "' + req.body.profile.id + '" sudah ada'})
-              return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
-            } else {
-              newUserReal(req, res, vals);
-            }
-          } else {
-            newUserReal(req, res, vals);
-          }
-        });
 
       } else {
         vals.form = true;
@@ -338,27 +352,30 @@ module.exports = function (app) {
 
 
       if (isLocalAdmin && parseInt(req.body.profile.echelon) != 0) {
-        if (req.body.profile && req.body.profile.id && req.body.profile.id.length != 18) {
-          vals.unsuccessful = true;
-          vals.invalidNip = true;
-          utils.render(req, res, 'admin-edit-user', vals, 'base-admin-authenticated');
-          return;
-        }
+        category.list({categoryName:req.body.profile.category},function(cat) {
+          if (req.body.profile && req.body.profile.id && req.body.profile.id.length != parseInt(cat[0].idLength)) {
+            vals.unsuccessful = true;
+            vals.invalidId = true;
+            utils.render(req, res, 'admin-edit-user', vals, 'base-admin-authenticated');
+            return;
+          } else {
+            user.list({ search: {'profile.id': req.body.profile.id, 'profile.category': req.body.profile.category}}, function (r) {
+              if (isLocalAdmin && r[0] != null && parseInt(req.body.profile.echelon) != 0) {
+                if (r[0].profile.id == req.body.profile.id && r[0].username != req.body.username) {
+                  vals.unsuccessful = true;
+                  vals.existNip = true;
+                  utils.render(req, res, 'admin-edit-user', vals, 'base-admin-authenticated');
+                } else {
+                  edit(req, res, vals);
+                }
+              } else {
+                edit(req, res, vals);
+              }
+            });
+          }
+        });
       }
 
-      user.list({ search: {'profile.id': req.body.profile.id}}, function (r) {
-        if (isLocalAdmin && r[0] != null && parseInt(req.body.profile.echelon) != 0) {
-          if (r[0].profile.id == req.body.profile.id && r[0].username != req.body.username) {
-            vals.unsuccessful = true;
-            vals.existNip = true;
-            utils.render(req, res, 'admin-edit-user', vals, 'base-admin-authenticated');
-          } else {
-            edit(req, res, vals);
-          }
-        } else {
-          edit(req, res, vals);
-        }
-      });
     } else {
       vals.form = true;
       vals.username = req.params.id;
@@ -386,7 +403,10 @@ module.exports = function (app) {
             vals[echelonSelected] = 'selected';
           }
         }
-        utils.render(req, res, 'admin-edit-user', vals, 'base-admin-authenticated');
+        category.list(function(cat) {
+          vals.userCategory = cat;
+          utils.render(req, res, 'admin-edit-user', vals, 'base-admin-authenticated');
+        });
       });
     }
   }

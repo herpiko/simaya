@@ -21,7 +21,7 @@
       <div class="matter">
           {{#successful}}
           <div class="alert alert-success">
-                  Kategori pengguna {{successful}} telah disimpan.
+                  Kategori pengguna telah disimpan.
           </div>
           {{/successful}}
           {{#removed}}
@@ -44,9 +44,9 @@
           {{#categoryList}}
             <tr onclick="document.location='/admin/edit-user-category/{{categoryName}}'">
               <td><a href="/admin/edit-user-category/{{categoryName}}">{{categoryName}}</a></td>
-              <td>{{categoryDesc}}</td>
-              <td>{{categoryId}}</td>
-              <td>{{idLength}}</td>
+              <td>{{categoryDesc}}{{^categoryDesc}}-{{/categoryDesc}}</td>
+              <td>{{categoryId}}{{^categoryId}}-{{/categoryId}}</td>
+              <td>{{idLength}}{{^idLength}}-{{/idLength}}</td>
             </tr>
           {{/categoryList}}
           {{^categoryList}}
@@ -54,7 +54,6 @@
               <td colspan=2 class="center"><i>Tidak ada data</i></td>
             </tr>
           {{/categoryList}}
-
           </tbody>
           </table>
 

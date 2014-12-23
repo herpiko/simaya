@@ -2,24 +2,6 @@ module.exports = register;
 function userCategory(app) {
   if (!(this instanceof userCategory)) return new userCategory(app);
   this.db = app.db('userCategory');
-
-  /* this.db.validate = function(document, update, callback) { */
-  /*   var validator = app.validator(document, update); */
-    
-  /*   validator.validateRegex({ */
-  /*     idLength: [/^[0-9]{1,10}$/, 'Invalid Id Length'], */
-  /*   }); */
-    
-  /*   if (validator.isInserting()) { */
-  /*     validator.validateQuery({ */
-  /*       categoryName: [db, {categoryName: update.categoryName}, false, 'There is already a category with this name'] */
-  /*     }, function () { */
-  /*       callback(null, validator); */
-  /*     }); */
-  /*   } else { */
-  /*     callback(null, validator); */
-  /*   } */
-  /* } */
 }
 userCategory.prototype.insert = function (data, callback) {
   var self = this;
