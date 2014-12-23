@@ -70,6 +70,47 @@
             </div>
           </div>
           <div class="control-group">
+            <label class="control-label" for="profile[category]">Kategori Pengguna</label>
+            <div class="controls">
+              <select name="profile[category]" class="span6" id="category-input">
+                <option value="" selected disabled></option>
+                {{#userCategory}}
+                <option value="{{categoryName}}" data-id="{{categoryId}}">{{categoryName}}</option>
+                {{/userCategory}}
+              </select>
+            </div>
+          </div>
+          <script>
+            $("#category-input").change(function(){
+              var idType = $("option:selected[data-id]").attr("data-id");
+              if (idType) {
+                $("#id-control-label").html(idType);  
+                if (idType == "NIP") {
+                  $("#nip-control").removeClass("hidden");
+                  $("#id-control").addClass("hidden");
+                  $("#class-input").val("");
+                  $("#class").removeClass("hidden");
+                  $("input[name='profile[id]'][nip-check='true']").attr("disabled",false);
+                  $("input[name='profile[id]'][nip-check='false']").attr("disabled",true);
+                } else {
+                  $("#id-control").removeClass("hidden");
+                  $("#nip-control").addClass("hidden");
+                  $("#class-input").val("");
+                  $("#class").addClass("hidden");
+                  $("input[name='profile[id]'][nip-check='false']").attr("disabled",false);
+                  $("input[name='profile[id]'][nip-check='true']").attr("disabled",true);
+                }
+              } else {
+                $("#nip-control").addClass("hidden");  
+                $("#id-control").addClass("hidden");  
+                $("#class-input").val("");
+                $("#class").addClass("hidden");
+                $("input[name='profile[id]'][nip-check='false']").attr("disabled",true);
+                $("input[name='profile[id]'][nip-check='true']").attr("disabled",true);
+              }
+            });
+          </script>
+          <div class="control-group">
             <label class="control-label" for="profile[fullName]">Nama Lengkap</label>
             <div class="controls">
               <input class="span6" type=text name="profile[fullName]" value="{{profile.fullName}}" />
@@ -145,6 +186,7 @@
             <label class="control-label" for="profile[class]">Golongan</label>
             <div class="controls">
               <select name="profile[class]" class="span6" id="class-input">
+                <option value="" selected disabled></option>
                 <option value="1a" {{#1a}}selected{{/1a}}>I/a (Juru Muda)</option>
                 <option value="1b" {{#1b}}selected{{/1b}}>I/b (Juru Muda Tingkat 1)</option>
                 <option value="1c" {{#1c}}selected{{/1c}}>I/c (Juru)</option>
@@ -168,11 +210,16 @@
               </select>
             </div>
           </div>
-
-          <div class="control-group" id="nip-control">
-            <label class="control-label" for="profile[id]">NIP</label>
+          <div class="control-group hidden" id="id-control">
+            <label id="id-control-label" class="control-label" for="profile[id]"></label>
             <div class="controls">
-              <input class="span6" id="nip-input" type=text name="profile[id]" value="{{profile.id}}" />
+              <input class="span6" id="nip-input" type=text name="profile[id]" nip-check="false" value="{{profile.id}}" />
+            </div>
+          </div>
+          <div class="control-group hidden" id="nip-control">
+            <label id="nip-control-label" class="control-label" for="profile[id]">NIP</label>
+            <div class="controls">
+              <input class="span6" id="nip-input" type=text name="profile[id]" nip-check="true" value="{{profile.id}}" />
               <span class="help-inline" id="nip-help-inline"></span>
             </div>
           </div>

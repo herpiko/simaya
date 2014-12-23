@@ -194,7 +194,7 @@ module.exports = function (app) {
         res.redirect("/")
       }
     }
-    var isPolitical = (req.body.id === "000000000000000000");
+    /* var isPolitical = (req.body.id === "000000000000000000"); */
     role.list(function(roleList) {
       vals.roleList = roleList;
       if (typeof(req.body) === "object" && Object.keys(req.body).length != 0) {
@@ -202,18 +202,29 @@ module.exports = function (app) {
         vals.profile = req.body.profile;
 
         if (parseInt(req.body.profile.echelon) != 0) {
-          if (isLocalAdmin && req.body.profile.id.length != 18 && !isPolitical) {
-            vals.unsuccessful = true;
-            vals.form = true;
-            vals.messages = vals.messages || []
-            vals.messages.push({message: 'NIP "' + req.body.profile.id + '" tidak sesuai. NIP harus 18 angka.'})
-            return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+          if (req.body.profile.category && req.body.profile.id) {
+            // validate PNS's NIP
+            if (isLocalAdmin && req.body.profile.id.length != 18 && req.body.profile.category == "PNS") {
+              vals.unsuccessful = true;
+              vals.form = true;
+              vals.messages = vals.messages || []
+              vals.messages.push({message: 'NIP "' + req.body.profile.id + '" tidak sesuai. NIP harus 18 angka.'})
+              return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+            } else if (isLocalAdmin && req.body.profile.category && !req.body.profile.id.length) {
+              vals.unsuccessful = true;
+              vals.form = true;
+              vals.messages = vals.messages || []
+              vals.messages.push({message: 'Nomor identitas harus diisi.'})
+              return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+            }
+          } else {
+            
           }
         }
 
         user.list({ search: {'profile.id': req.body.profile.id}}, function (r) {
           if (isLocalAdmin && r[0] != null && parseInt(req.body.profile.echelon) != 0) {
-            if (r[0].profile.id == req.body.profile.id && r[0].username != req.body.username && !isPolitical) {
+            if (r[0].profile.id == req.body.profile.id && r[0].username != req.body.username && req.body.profile.category == "PNS") {
               vals.unsuccessful = true;
               vals.existNip = true;
               vals.form = true;
@@ -232,7 +243,10 @@ module.exports = function (app) {
         vals.form = true;
         org.list(undefined, function (r) {
           vals.orgs = r;
-          utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+          category.list(function(categoryList) {
+            vals.userCategory = categoryList;
+            utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
+          });
         });
       }
     });
@@ -1170,7 +1184,7 @@ module.exports = function (app) {
       var vals = [];
       vals.categoryList = categoryList;
       if (req.successful) {
-        vals.successful = true;
+        vals.successful = req.successful;
       }
       if (req.removed) {
         vals.removed = req.removed;
@@ -1184,16 +1198,16 @@ module.exports = function (app) {
       if (req.path.indexOf('/admin') > -1) {
         if (typeof(req.body) === "object" && Object.keys(req.body).length != 0) {
           vals.categoryName = req.body.categoryName;
-          vals.categoryDescription = req.body.categoryDescription;
+          vals.categoryDesc = req.body.categoryDesc;
           vals.categoryId = req.body.categoryId;
           vals.idLength = req.body.idLength;
           category.insert(vals, function(err){
-            if (Object.keys(err.errors).length > 0) {
-              if (err.errors.categoryName) {
+            if (err) {
+              if (err.categoryName) {
                 vals.duplicateCategory = req.body.categoryName;
                 vals.categoryName = "";
               }
-              if (err.errors.idLength) {
+              if (err.idLength) {
                 vals.invalidIdLength = true;
                 vals.idLength = "";
               }
@@ -1201,7 +1215,7 @@ module.exports = function (app) {
               vals.form = true;
               utils.render(req, res, 'admin-user-category-form', vals, 'base-admin-authenticated');
             } else {
-              req.successful = true;
+              req.successful = req.body.categoryName;
               userCategory(req,res);
             }
           });      
@@ -1221,13 +1235,13 @@ module.exports = function (app) {
       editMode: true,
       requireAdmin: true,
       categoryName: req.body.categoryName,
-      categoryDescription: req.body.categoryDescription,
+      categoryDesc: req.body.categoryDesc,
       categoryId: req.body.categoryId,
       idLength: req.body.idLength,
     }
     var data = {
       categoryName : req.body.categoryName,
-      categoryDescription : req.body.categoryDescription,
+      categoryDesc : req.body.categoryDesc,
       categoryId : req.body.categoryId,
       idLength : req.body.idLength,
     }
@@ -1239,14 +1253,9 @@ module.exports = function (app) {
           userCategory(req, res);
         }); 
       } else {
-          console.log("update");
-        category.edit(req.body.oldCategoryName, data, function(err) {
-          if (Object.keys(err.errors).length > 0) {
-            if (err.errors.categoryName) {
-              vals.duplicateCategory = req.body.categoryName;
-              vals.categoryName = "";
-            }
-            if (err.errors.idLength) {
+          category.edit(req.body.oldCategoryName, data, function(err) {
+          if (err) {
+            if (err.idLength) {
               vals.invalidIdLength = true;
               vals.idLength = "";
             }
@@ -1278,7 +1287,7 @@ module.exports = function (app) {
         if (r.length == 1) {
           vals.form = true;
           vals.categoryName = r[0].categoryName; 
-          vals.categoryDescription = r[0].categoryDescription; 
+          vals.categoryDesc = r[0].categoryDesc; 
           vals.categoryId = r[0].categoryId; 
           vals.idLength = r[0].idLength; 
         } else {
