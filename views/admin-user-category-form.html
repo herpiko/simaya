@@ -3,12 +3,12 @@
 <link rel="stylesheet" href="/css/ace-skins.min.css"/>
       <div class="page-head">
         <h2 class="pull-left">
-          {{^title}}
+          {{^editMode}}
             Tambah Kategori Pengguna
-          {{/title}}
-          {{#title}}
-            {{title}}
-          {{/title}}
+          {{/editMode}}
+          {{#editMode}}
+            Ubah Kategori Pengguna
+          {{/editMode}}
         </h2>
         <div class="clearfix"></div>
       </div>

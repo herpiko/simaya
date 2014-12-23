@@ -1251,7 +1251,6 @@ module.exports = function (app) {
   }
   var editUserCategory = function(req, res) {
     var vals = {
-      title: 'Ubah Kategori Pengguna',
       editMode: true,
       requireAdmin: true,
       categoryName: req.body.categoryName,
