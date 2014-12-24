@@ -48,17 +48,15 @@
       {{#messages}}
       <li>{{message}}</li>
       {{/messages}}
-      {{#error}}
-      {{#error.invalidId}}
+      {{#invalidId}}
       <li>Nomor identitas masih salah</li>
-      {{/error.invalidId}}
-      {{#error.emptyId}}
+      {{/invalidId}}
+      {{#emptyId}}
       <li>Nomor identitas kosong</li>
-      {{/error.emptyId}}
-      {{#error.idExists}}
+      {{/emptyId}}
+      {{#idExists}}
       <li>Nomor identitas sudah digunakan.</li>
-      {{/error.idExists}}
-      {{/error}}
+      {{/idExists}}
     </div>
     {{/unsuccessful}}
     {{#successful}}

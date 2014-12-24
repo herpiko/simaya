@@ -212,9 +212,7 @@ module.exports = function (app) {
               if (isLocalAdmin && req.body.profile.id.length != cat[0].idLength) {
                 vals.unsuccessful = true;
                 vals.form = true;
-                vals.error = {
-                  invalidId : true
-                }
+                vals.invalidId = true;
                 category.list(function(categoryList) {
                   vals.userCategory = categoryList;
                   return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
@@ -223,9 +221,7 @@ module.exports = function (app) {
               } else if (isLocalAdmin && req.body.profile.category && !req.body.profile.id.length) {
                 vals.unsuccessful = true;
                 vals.form = true;
-                vals.error = {
-                  emptyId : true
-                }
+                vals.emptyId = true;
                 category.list(function(categoryList) {
                   vals.userCategory = categoryList;
                   return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
@@ -237,9 +233,7 @@ module.exports = function (app) {
                       vals.unsuccessful = true;
                       vals.existNip = true;
                       vals.form = true;
-                      vals.error = {
-                        idExists : true
-                      }
+                      vals.idExists = true;
                       category.list(function(categoryList) {
                         vals.userCategory = categoryList;
                         return utils.render(req, res, 'admin-new-user', vals, 'base-admin-authenticated');
