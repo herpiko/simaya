@@ -411,7 +411,7 @@ module.exports = function(app) {
         res.send(JSON.stringify(copy));
       });
     } else {
-      res.send("[]");
+      res.send([]);
     }
   }
 
