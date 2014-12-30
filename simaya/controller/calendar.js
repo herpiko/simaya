@@ -182,18 +182,13 @@ module.exports = function(app) {
         req.body.startDate &&
         req.body.startTime &&
         req.body.endDate &&
-        req.body.endTime &&
-        req.body.userTimezone) {
+        req.body.endTime) {
       
-      var startTimezone = new Date(req.body.userTimezone);
-      var startDateSplitted = req.body.startDate.split("/");
-      var start = new Date(startTimezone.setFullYear(parseInt(startDateSplitted[2]),(parseInt(startDateSplitted[1])-1), parseInt(startDateSplitted[0])));
+      var start = new Date(req.body.startDate);
       start.setHours(parseInt(req.body.startTime[0] + req.body.startTime[1], 10));
       start.setMinutes(parseInt(req.body.startTime[2] + req.body.startTime[3], 10));
       
-      var endTimezone = new Date(req.body.userTimezone);
-      var endDateSplitted = req.body.endDate.split("/");
-      var end = new Date(endTimezone.setFullYear(parseInt(endDateSplitted[2]),(parseInt(endDateSplitted[1])-1), parseInt(endDateSplitted[0])));
+      var end = new Date(req.body.endDate);
       end.setHours(parseInt(req.body.endTime[0] + req.body.endTime[1], 10));
       end.setMinutes(parseInt(req.body.endTime[2] + req.body.endTime[3], 10));
 

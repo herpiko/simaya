@@ -8,8 +8,6 @@ var setupNewEvents = function() {
     $("[name=recurrence]").val("0");
     $("[name=visibility]").val("0");
     $("[name=description]").val("");
-    var now = new Date();
-    $("#user-timezone").val(now);
   })
   $("#edit-event-button-ok").click(function() {
     $("#add-event-dialog").modal("show");
@@ -51,21 +49,42 @@ var setupNewEvents = function() {
     $("#dialog-event-date-text").text(moment(now).format("dddd, DD/MM/YYYY"));
     $("#add-event-dialog").modal("show");
   });
+  var toUTC = function(date, utc){
+    var utc = new Date(Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      date.getHours(),
+      date.getMinutes()
+    ));
+    return utc;
+  }
+  var convertToUTC = function(cb){
+    var start = $("#start-date").val();
+    var end = $("#end-date").val();
+    var startDate = new Date(moment(start, "DD/MM/YYYY").toDate()); 
+    var endDate = new Date(moment(end, "DD/MM/YYYY").toDate()); 
+    $("#start-date").val(toUTC(startDate));
+    $("#end-date").val(toUTC(endDate));
+    cb();
+ }
   $("#add-event-button-ok").click(function(e) {
     e.preventDefault();
-
-    $('#form').upload("/calendar/new", function(result) {
-      needPost = false;
-      console.log(result)
-      result = JSON.parse(result);
-      if (result.status == "OK") {
-        document.location = "/calendar/day"; 
-      } else {
-        $(".error-message").addClass("hidden");
-        $(".alert").removeClass("hidden");
-        $("#error-" + result.error).removeClass("hidden");
-      }
+    convertToUTC(function(){
+      $('#form').upload("/calendar/new", function(result) {
+        needPost = false;
+        console.log(result)
+        result = JSON.parse(result);
+        if (result.status == "OK") {
+          document.location = "/calendar/day"; 
+        } else {
+          $(".error-message").addClass("hidden");
+          $(".alert").removeClass("hidden");
+          $("#error-" + result.error).removeClass("hidden");
+        }
+      });
     });
+    
   })
 }
 
