@@ -955,14 +955,8 @@ Node.prototype.restore = function(options, fn) {
     });
   }
 
-  /* if (isMaster) { */
-    tmpCollection = options.collection + syncId; 
-    targetCollection = options.collection;
-  /* } else { */
-    /* tmpCollection = options.collection; */
-    /* targetCollection = tmpCollection; */
-  /* } */
-  console.log("================"+targetCollection);
+  tmpCollection = options.collection + syncId; 
+  targetCollection = options.collection;
 
   args.push("-h");
   args.push(serverConfig.host);
@@ -1064,8 +1058,8 @@ Node.prototype.restore = function(options, fn) {
       if (isMaster == false) {
         // in local node, trust everything comes from the server
         console.log(">imported");
-        simpleMove(function(result){
-          fn(result,data);
+        simpleMove(function(r){
+          fn(r,data);
         })
       } else {
         // in master node, check everything comes from the slave
@@ -1474,7 +1468,7 @@ Node.prototype.checkNode = function(options, fn) {
         {state:1,_id:1},
         function(err, node){
       if (err) return cb(err);
-      if (!node) return cb(new Error("checkNode Node is not found"));
+      if (!node) return cb(new Error("Node is not found"));
       cb(null, node);
     });
   }
@@ -1497,7 +1491,7 @@ Node.prototype.localCheckNode = function(options, fn) {
   var findNode = function(cb) {
     self.LocalNodes.findOne({ installationId : installationId}, function(err, node){
       if (err) return cb(err);
-      if (!node) return cb(new Error("localchecknode Node is not found"));
+      if (!node) return cb(new Error("Node is not found"));
       cb(null, node);
     });
   }
@@ -1552,7 +1546,7 @@ Node.prototype.sendLocalManifest = function(options, fn) {
   var findNode = function(installationId, cb) {
     self.LocalNodes.findOne({ installationId : installationId}, function(err, node){
       if (err) return cb(err);
-      if (!node) return cb(new Error("secondlocalmanifest Node is not found"));
+      if (!node) return cb(new Error("Node is not found"));
       cb(null, node);
     });
   }
@@ -1599,7 +1593,7 @@ Node.prototype.localSyncNode = function(options, fn) {
   var findNode = function(cb) {
     self.LocalNodes.findOne({ installationId : installationId}, function(err, node){
       if (err) return cb(err);
-      if (!node) return cb(new Error("localsyncnode Node is not found "+installationId));
+      if (!node) return cb(new Error("Node is not found "+installationId));
       cb(null, node);
     });
   }
