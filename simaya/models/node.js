@@ -955,13 +955,14 @@ Node.prototype.restore = function(options, fn) {
     });
   }
 
-  if (isMaster) {
+  /* if (isMaster) { */
     tmpCollection = options.collection + syncId; 
     targetCollection = options.collection;
-  } else {
-    tmpCollection = options.collection;
-    targetCollection = tmpCollection;
-  }
+  /* } else { */
+    /* tmpCollection = options.collection; */
+    /* targetCollection = tmpCollection; */
+  /* } */
+  console.log("================"+targetCollection);
 
   args.push("-h");
   args.push(serverConfig.host);
@@ -977,7 +978,6 @@ Node.prototype.restore = function(options, fn) {
   var data = {
     _id: self.ObjectID(options.id),
   }
-
   var simpleMove = function(cb) {
     var numRecords = 0;
     var processedRecords = 0;
@@ -986,14 +986,16 @@ Node.prototype.restore = function(options, fn) {
       cursor.nextObject(function(err, item) {
         if (err) return fn(err);
         if (!item) return mcb(null);
-
         var id = item._id;
         delete(item._id);
         destination.update({ _id: id }, { $set: item }, {upsert:1}, function(err) {
-          processedRecords ++;
-          process.stdout.write("Importing data " + processedRecords + "/" + numRecords + "\r");
           if (err) return fn(err);
-          move(cursor, mcb);
+          destination.update({ _id: id }, { $set: { "synced": true } }, {upsert:1}, function(err) {
+            processedRecords ++;
+            process.stdout.write("Importing and marking data as 'synced' " + processedRecords + "/" + numRecords + "\r");
+            if (err) return fn(err);
+            move(cursor, mcb);
+          });
         });
       });
     }
@@ -1015,6 +1017,7 @@ Node.prototype.restore = function(options, fn) {
       });
     });
   }
+
 
   var checks = {};
 
@@ -1061,7 +1064,9 @@ Node.prototype.restore = function(options, fn) {
       if (isMaster == false) {
         // in local node, trust everything comes from the server
         console.log(">imported");
-        fn(null, data);
+        simpleMove(function(result){
+          fn(result,data);
+        })
       } else {
         // in master node, check everything comes from the slave
         console.log(">checking data");
@@ -1469,7 +1474,7 @@ Node.prototype.checkNode = function(options, fn) {
         {state:1,_id:1},
         function(err, node){
       if (err) return cb(err);
-      if (!node) return cb(new Error("Node is not found"));
+      if (!node) return cb(new Error("checkNode Node is not found"));
       cb(null, node);
     });
   }
@@ -1492,7 +1497,7 @@ Node.prototype.localCheckNode = function(options, fn) {
   var findNode = function(cb) {
     self.LocalNodes.findOne({ installationId : installationId}, function(err, node){
       if (err) return cb(err);
-      if (!node) return cb(new Error("Node is not found"));
+      if (!node) return cb(new Error("localchecknode Node is not found"));
       cb(null, node);
     });
   }
@@ -1547,7 +1552,7 @@ Node.prototype.sendLocalManifest = function(options, fn) {
   var findNode = function(installationId, cb) {
     self.LocalNodes.findOne({ installationId : installationId}, function(err, node){
       if (err) return cb(err);
-      if (!node) return cb(new Error("Node is not found"));
+      if (!node) return cb(new Error("secondlocalmanifest Node is not found"));
       cb(null, node);
     });
   }
@@ -1594,7 +1599,7 @@ Node.prototype.localSyncNode = function(options, fn) {
   var findNode = function(cb) {
     self.LocalNodes.findOne({ installationId : installationId}, function(err, node){
       if (err) return cb(err);
-      if (!node) return cb(new Error("Node is not found"));
+      if (!node) return cb(new Error("localsyncnode Node is not found "+installationId));
       cb(null, node);
     });
   }
