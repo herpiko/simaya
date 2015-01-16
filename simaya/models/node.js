@@ -985,6 +985,7 @@ Node.prototype.restore = function(options, fn) {
         var id = item._id;
         delete(item._id);
         destination.update({ _id: id }, { $set: item }, {upsert:1}, function(err) {
+          
           if (err) return fn(err);
           destination.update({ _id: id }, { $set: { "synced": true } }, {upsert:1}, function(err) {
             processedRecords ++;
@@ -998,7 +999,7 @@ Node.prototype.restore = function(options, fn) {
 
     var source = self.db(tmpCollection);
     var destination = self.db(targetCollection);
-    source.find({}, function(err, cursor) {
+    source.find({},{timeout: false}, function(err, cursor) {
       if (err) return fn(err);
       if (!cursor) return cb(null);
       cursor.count(function(err, count) {
