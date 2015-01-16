@@ -955,13 +955,8 @@ Node.prototype.restore = function(options, fn) {
     });
   }
 
-  if (isMaster) {
-    tmpCollection = options.collection + syncId; 
-    targetCollection = options.collection;
-  } else {
-    tmpCollection = options.collection;
-    targetCollection = tmpCollection;
-  }
+  tmpCollection = options.collection;
+  targetCollection = tmpCollection;
 
   args.push("-h");
   args.push(serverConfig.host);
@@ -990,10 +985,13 @@ Node.prototype.restore = function(options, fn) {
         var id = item._id;
         delete(item._id);
         destination.update({ _id: id }, { $set: item }, {upsert:1}, function(err) {
-          processedRecords ++;
-          process.stdout.write("Importing data " + processedRecords + "/" + numRecords + "\r");
           if (err) return fn(err);
-          move(cursor, mcb);
+          destination.update({ _id: id }, { $set: { "synced": true } }, {upsert:1}, function(err) {
+            processedRecords ++;
+            process.stdout.write("Importing and marking data as 'synced' " + processedRecords + "/" + numRecords + "\r");
+            if (err) return fn(err);
+            move(cursor, mcb);
+          });
         });
       });
     }
@@ -1061,7 +1059,9 @@ Node.prototype.restore = function(options, fn) {
       if (isMaster == false) {
         // in local node, trust everything comes from the server
         console.log(">imported");
-        fn(null, data);
+        simpleMove(function(r){
+          fn(null, data);
+        });
       } else {
         // in master node, check everything comes from the slave
         console.log(">checking data");
