@@ -879,7 +879,12 @@ Node.prototype.requestSync = function(options, fn) {
 
 Node.prototype.dump = function(options, fn) {
   var self = this;
-  var query = JSON.stringify(options.query).replace(/"ISODate\(([0-9-]+)\)DateISO"/g, "new Date($1)");
+  if (options.collection == "user" || options.collection == "jobTitle" || options.collection == "organization") {
+    var query = JSON.stringify(options.query).replace(/"ISODate\(([0-9-]+)\)DateISO"/g, "new Date($1)");
+    console.log(query);
+  } else {
+    var query = JSON.stringify(options.query).replace(/"ISODate\(([0-9-]+)\)DateISO"/g, "new Date($1)");
+  }
   var serverConfig = self.app.dbClient.serverConfig;
   var args = [];
   args.push("-h");
