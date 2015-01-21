@@ -45,7 +45,9 @@ module.exports = function(app) {
       db.getCollection(function (error, collection) {
         
         data._id = collection.pkFactory.createPk();
-        data.origin = app.simaya.installationId;
+        if (app.simaya.installationId) {
+          data.origin = app.simaya.installationId;
+        }
 
         db.validateAndInsert(data, function (error, validator) {
           callback(error, validator);
