@@ -1340,7 +1340,6 @@ Node.prototype.prepareSync_organization = function(options, fn) {
   } else {
     options.query = {
       path : { $regex: "^(?!" + options.organization + ")" },
-      origin : { $regex: "^(?!" + options.installationId + ")" },
     }
   }
   options.query = {
