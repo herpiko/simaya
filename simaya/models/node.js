@@ -823,11 +823,14 @@ Node.prototype.group = function(options, fn){
  */
 Node.prototype.remove = function(options, fn){
   var self = this;
-  var NodeRequest = this.db(options.collection || "node");
-  NodeRequest.findOne({_id : this.ObjectID(options._id)}, function(err, node){
-    if (err) return fn(err);
-    if (!node) return fn(new Error("not found"));
-    NodeRequest.remove({_id : node._id}, fn);
+  //also disconnect the node
+  self.disable(options, function(){
+    var NodeRequest = this.db(options.collection || "node");
+    NodeRequest.findOne({_id : this.ObjectID(options._id)}, function(err, node){
+      if (err) return fn(err);
+      if (!node) return fn(new Error("not found"));
+      NodeRequest.remove({_id : node._id}, fn);
+    });
   });
 }
 
