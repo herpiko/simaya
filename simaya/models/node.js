@@ -1299,8 +1299,8 @@ Node.prototype.prepareSync_user = function(options, fn) {
       $regex: "^" + options.organization 
     }
   } else {
-    options.query = {
-      "profile.organization" : { $regex: "^(?!" + options.organization + ")" },
+    options.query["profile.organization"] = {
+      $regex: "^(?!" + options.organization + ")" 
     }
   }
   var opts = _.clone(options);
