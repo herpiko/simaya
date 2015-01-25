@@ -135,6 +135,23 @@ module.exports = function(app) {
 
   }));
 
+  server.exchange(oauth2orize.exchange.password(function (client, username, password, scope, done) {
+    user.authenticate(username, password, function(r){
+      if (!r) return done(new Error ("Invalid credential"));
+      var accessToken = uid(128);
+      var newToken =  {
+        client : client,
+        user : username,
+        accessToken : accessToken
+      }
+      atok.set(newToken, function(err, result){
+        var date = new Date();
+        date.setDate(date.getDate() + MONTH);
+        done(null, accessToken, null, { 'expired_at': token.expire_at });
+      });
+    });
+  }));
+
   var webUsersCheck = function(req, res, next) {
     if (req.session && req.session.authId) {
       var position = {
@@ -368,7 +385,7 @@ module.exports = function(app) {
   // 3. 
   var token = [
     // todo: basic auth
-    filter,
+    /* filter, */
     passport.authenticate(["basic", "oauth2-client-password"], { session: false }),
     server.token(),
     server.errorHandler()
