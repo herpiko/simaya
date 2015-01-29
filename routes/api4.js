@@ -27,6 +27,7 @@ module.exports = function(app){
   // users
   app.get(prefix + "/users/self", oauth2.protectedResource, api4.user.self);
   app.get(prefix + "/users/:id", oauth2.protectedResource, api4.user.info);
+  app.get(prefix + "/users/logout/:id", oauth2.protectedResource, api4.user.logout);
 
   // letters
   app.get(prefix + "/letters/incomings", oauth2.protectedResource, api4.letter.incomings);

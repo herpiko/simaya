@@ -1,5 +1,5 @@
 module.exports = function(app){
-
+  var atok = require("../../../models/oauth2/accessToken")(app);
   var user = require('../../../../sinergis/models/user')(app);
   var ObjectID = app.ObjectID;
 
@@ -47,6 +47,7 @@ module.exports = function(app){
     obj.data = req.session.currentUserProfile;
     res.send(obj);
   }
+  
 
   /**
    * @api {get} /users/:id User Information
@@ -99,9 +100,51 @@ module.exports = function(app){
       
     });
   }
+  
+  /**
+   * @api {get} /users/logout/:id Removing Token
+   * @apiVersion 4.0.0
+   * @apiName RemoveToken
+   * @apiGroup Users
+   * @apiPermission token
+   *
+   * @apiDescription Get basic information about a user
+   * 
+   * @apiParam {String} access_token The access token
+   * @apiParam {String} id Possible values: <code>username</code>
+   *
+   * @apiExample URL Structure:
+   * // DEVELOPMENT
+   * http://ayam.vps1.kodekreatif.co.id/users/logout/:id
+   * 
+   * @apiExample Example usage:
+   * curl http://ayam.vps1.kodekreatif.co.id/users/logout/joko.susanto?access_token=f3fyGRRoKZ...
+   */
+  var logout = function (req, res) {
+    var query = {};
+    if (isValidObjectID(req.params.id)){
+      query.username = req.params.id;
+    }
+    user.list({ search: query }, function(r) {
+      if (!r || r.length == 0) {
+        obj.meta.code = 404;
+        obj.meta.errorMessage = "User Not Found";
+        return res.send(obj.meta.code, obj);
+      }
+      var q = {
+        user : req.params.id,
+        accessToken : req.header("Authorization").split(" ")[1]
+      }
+      console.log("removing " + req.header("Authorization").split(" ")[1]);
+      atok.del(q, function(err, result){
+        return res.send("Token removed");
+      });
+    });
+  }
 
   return {
     self : self,
-    info : info
+    info : info,
+    logout : logout
   }
 }
