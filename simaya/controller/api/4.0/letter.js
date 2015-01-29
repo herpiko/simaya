@@ -145,6 +145,15 @@ module.exports = function(app){
     search.limit = 20;
     list(search, req, res);
   }
+  
+  var incomingsCc = function (req, res) {
+    var search = letterWeb.buildSearchForIncomingCc(req, res);
+    search = letterWeb.populateSortForIncoming(req, search);
+    search.fields = { title : 1, date : 1, sender : 1, receivingOrganizations : 1, senderManual : 1, readStates : 1};
+    search.page = req.query["page"] || 1;
+    search.limit = 20;
+    list(search, req, res);
+  }
 
   /**
    * @api {get} /letters/outgoings Outgoing Letters
@@ -710,6 +719,7 @@ module.exports = function(app){
 
     letter.link(me, id, ids, function(err, result) {
       if (err) {
+        console.log(err);
         res.send(500, {
           status: {
             ok: false
@@ -730,6 +740,7 @@ module.exports = function(app){
 
   return {
     incomings : incomings,
+    incomingsCc : incomingsCc,
     outgoings : outgoings,
     read : read,
     sendLetter: sendLetter,
