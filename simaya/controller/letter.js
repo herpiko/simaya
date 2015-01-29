@@ -1313,7 +1313,6 @@ Letter = module.exports = function(app) {
     }
     return search;
   }
-
   var buildSearchForIncoming = function(req, res) {
     var search = {
       search: {}
@@ -1342,7 +1341,37 @@ Letter = module.exports = function(app) {
       var o = "receivingOrganizations." + req.session.currentUserProfile.organization + ".status";
       search.search[o] = letter.Stages.RECEIVED;
     }
+    return search;
+  }
 
+  var buildSearchForIncomingCc = function(req, res) {
+    var search = {
+      search: {}
+    };
+    if (utils.currentUserHasRoles([app.simaya.administrationRole], req, res)) {
+      var o = "receivingOrganizations." + req.session.currentUserProfile.organization;
+      var normalCase = {
+        status: letter.Stages.SENT, // displays SENT and ready to be received
+        creation: "normal",
+      }
+      normalCase[o] = { $exists: true};
+
+      var externalCase = {
+        creation: "external",
+      }
+      externalCase[o] = { status: letter.Stages.SENT };
+      search.search["$or"] = [];
+      search.search["$or"].push(normalCase);
+      search.search["$or"].push(externalCase);
+    } else {
+      search.search = {
+        ccList: {
+          $in: [req.session.currentUser]
+        },
+      }
+      var o = "receivingOrganizations." + req.session.currentUserProfile.organization + ".status";
+      search.search[o] = letter.Stages.RECEIVED;
+    }
     return search;
   }
 
@@ -2702,6 +2731,7 @@ Letter = module.exports = function(app) {
     , getDocumentMetadata: getDocumentMetadata
     , renderDocumentPage: renderDocumentPage
     , buildSearchForIncoming: buildSearchForIncoming
+    , buildSearchForIncomingCc: buildSearchForIncomingCc
     , buildSearchForOutgoing: buildSearchForOutgoing
     , buildSearchForViewing: buildSearchForViewing
     , populateSortForIncoming: populateSortForIncoming
