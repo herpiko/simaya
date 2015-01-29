@@ -138,6 +138,10 @@ module.exports = function(app){
    * curl http://ayam.vps1.kodekreatif.co.id/api/2/letters/incomings?access_token=f3fyGRRoKZ...
    */
   var incomings = function (req, res) {
+    console.log(req.params);
+    if (req.params['params'] === "cc") {
+      req.cc = true;
+    }
     var search = letterWeb.buildSearchForIncoming(req, res);
     search = letterWeb.populateSortForIncoming(req, search);
     search.fields = { title : 1, date : 1, sender : 1, receivingOrganizations : 1, senderManual : 1, readStates : 1};

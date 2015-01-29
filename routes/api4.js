@@ -30,6 +30,7 @@ module.exports = function(app){
 
   // letters
   app.get(prefix + "/letters/incomings", oauth2.protectedResource, api4.letter.incomings);
+  app.get(prefix + "/letters/incomings/:params", oauth2.protectedResource, api4.letter.incomings);
   app.get(prefix + "/letters/outgoings", oauth2.protectedResource, api4.letter.outgoings);
   app.get(prefix + "/letters/sender-selection", oauth2.protectedResource, api4.letter.senderSelection);
   app.get(prefix + "/letters/recipient-organization-selection", oauth2.protectedResource, api4.letter.orgSelection);

@@ -1313,7 +1313,6 @@ Letter = module.exports = function(app) {
     }
     return search;
   }
-
   var buildSearchForIncoming = function(req, res) {
     var search = {
       search: {}
@@ -1334,17 +1333,25 @@ Letter = module.exports = function(app) {
       search.search["$or"].push(normalCase);
       search.search["$or"].push(externalCase);
     } else {
-      search.search = {
-        recipients: {
-          $in: [req.session.currentUser]
-        },
+      if (req.cc) {
+        search.search = {
+          ccList: {
+            $in: [req.session.currentUser]
+          },
+        }
+      } else {
+        search.search = {
+          recipients: {
+            $in: [req.session.currentUser]
+          },
+        }
       }
       var o = "receivingOrganizations." + req.session.currentUserProfile.organization + ".status";
       search.search[o] = letter.Stages.RECEIVED;
     }
-
     return search;
   }
+
 
   var listIncomingBase = function(req, res, x, embed) {
     var vals = {
