@@ -69,12 +69,22 @@ module.exports = function(app){
    */
   var incomings = function(req, res) {
     var me = req.session.currentUser;
-    var search = {
-      search: {
-        "recipients.recipient": me, 
-      },
-      limit: 20,
-      page: (req.query["page"] || 1) 
+    if (req.params['params'] === "cc") {
+      var search = {
+        search: {
+          "sharedRecipients.recipient": me, 
+        },
+        limit: 20,
+        page: (req.query["page"] || 1) 
+      }
+    } else {
+      var search = {
+        search: {
+          "recipients.recipient": me, 
+        },
+        limit: 20,
+        page: (req.query["page"] || 1) 
+      }
     }
     listBase(search, req, res);
   }
