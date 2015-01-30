@@ -121,6 +121,9 @@ module.exports = function(app){
    * curl http://ayam.vps1.kodekreatif.co.id/users/logout/joko.susanto?access_token=f3fyGRRoKZ...
    */
   var logout = function (req, res) {
+    var obj = {
+      meta : { code : 200 },
+    }
     var query = {};
     if (isValidObjectID(req.params.id)){
       query.username = req.params.id;
@@ -137,7 +140,13 @@ module.exports = function(app){
       }
       console.log("removing " + req.header("Authorization").split(" ")[1]);
       atok.del(q, function(err, result){
-        return res.send("Token removed");
+        if (err) {
+          obj.meta.code = 404;
+          obj.meta.errorMessage = "Failed to remove the token.";
+          return res.send(obj.meta.code, obj);
+        }
+        obj.data = "Token removed";
+        return res.send(obj);
       });
     });
   }
