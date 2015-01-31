@@ -729,6 +729,69 @@ module.exports = function(app){
     });
   }
 
+  /**
+   * @api {get} /letters/constant Constant Data
+   * @apiVersion 4.0.0
+   * @apiName GetInitialData
+   * @apiGroup Letters And Agendas
+   * @apiPermission token
+   *
+   * @apiDescription Get constant data such as letterType, security, priority, etc
+   * 
+   * @apiParam {String} access_token The access token
+   * @apiParam {String} page The <code>page-th</code> of result group
+   * @apiParam {String} limit The maximum number of letters per page
+   *
+   * @apiExample URL Structure:
+   * // DEVELOPMENT
+   * http://ayam.vps1.kodekreatif.co.id/api/2/letters/constants
+   * 
+   * @apiExample Example usage:
+   * curl http://ayam.vps1.kodekreatif.co.id/api/2/letters/constants?access_token=f3fyGRRoKZ...
+   */
+  var constants = function(req, res) {
+    var data = {
+      "letterType" : [
+        "Peraturan",
+        "Pedoman",
+        "Petunjuk Pelaksanaan",
+        "Instruksi",
+        "Prosedur Tetap (SOP)",
+        "Surat Edaran",
+        "Keputusan",
+        "Surat Perintah/Surat Tugas",
+        "Nota Dinas",
+        "Memorandum",
+        "Surat Dinas",
+        "Surat Undangan",
+        "Surat Perjanjian",
+        "Surat Kuasa",
+        "Berita Acara",
+        "Surat Keterangan",
+        "Surat Pengantar",
+        "Pengumuman",
+        "Laporan",
+        "Lain-lain"
+      ],
+      "letterPriority" : [
+        "Biasa.success",
+        "Segera.warning",
+        "Sangat segera.danger"
+      ],
+      "letterClassification" : [
+        "Biasa.success",
+        "Rahasia.warning",
+        "Sangat rahasia.danger"
+      ],
+
+    }
+    res.send(200, {
+      status: {
+        ok: true
+      },
+      data: data
+    });
+  }
 
 
 
@@ -752,6 +815,8 @@ module.exports = function(app){
     reviewerCandidatesSelection : reviewerCandidatesSelection,
     rejectLetter : rejectLetter,
 
-    linkLetter: linkLetter
+    linkLetter: linkLetter,
+
+    constants : constants
   }
 }

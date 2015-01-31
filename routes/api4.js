@@ -23,6 +23,8 @@ module.exports = function(app){
 
   // dummy endpoint, saying hello to you
   app.get(prefix + "/say/hello", oauth2.protectedResource, api4.say.hello);
+  
+  app.get(prefix + "/letters/constants", oauth2.protectedResource, api4.letter.constants);
 
   // users
   app.get(prefix + "/users/self", oauth2.protectedResource, api4.user.self);
@@ -43,6 +45,7 @@ module.exports = function(app){
   app.get(prefix + "/letters/:id/documents", oauth2.protectedResource, api4.letter.attachments);
   app.post(prefix + "/letters/:id/link", oauth2.protectedResource, api4.letter.linkLetter);
   app.post(prefix + "/letters/new", oauth2.protectedResource, api4.letter.sendLetter);
+  
 
 
   // documents

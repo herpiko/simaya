@@ -2059,6 +2059,9 @@ Letter = module.exports = function(app) {
   }
 
   var reject = function(req, res) {
+    console.log(req.session.currentUser);
+    console.log(req.body.id);
+    console.log(req.body.reason);
     if (req.body.id) {
       var search = {
         search: {
