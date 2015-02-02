@@ -783,7 +783,17 @@ module.exports = function(app){
         "Rahasia.warning",
         "Sangat rahasia.danger"
       ],
-
+      "letterInstruction" : [
+        "Ditindaklanjuti",
+        "Ditanggapi tertulis",
+        "Disiapkan makalah/sambutan/presentasi sesuai tema",
+        "Koordinasikan dengan",
+        "Diwakili dan laporkan hasilnya",
+        "Dihadiri dan laporkan hasilnya",
+        "Disiapkan surat/memo dinas (internal)",
+        "Arsip",
+        "Lain-lain",
+      ],
     }
     res.send(200, {
       status: {
