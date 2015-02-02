@@ -265,10 +265,46 @@ module.exports = function(app){
     });
   }
 
+  var decline = function(req, res){
+    console.log(req.body);
+    req.api = true;
+    dispositionWeb.decline(req, function(err){
+      var obj = {
+        meta : { code : 200 },
+        data : "Disposition successfuly declined."
+      }
+      if (err) {
+        obj.meta.code = 404;
+        obj.meta.errorMessage = err;
+        obj.data = null;
+      }
+      res.send(JSON.stringify(obj));
+    });
+  }
+  
+  var share = function(req, res){
+    console.log(req.body);
+    req.api = true;
+    dispositionWeb.share(req, function(err){
+      var obj = {
+        meta : { code : 200 },
+        data : "Disposition successfuly shared."
+      }
+      if (err) {
+        obj.meta.code = 404;
+        obj.meta.errorMessage = err;
+        obj.data = null;
+      }
+      res.send(JSON.stringify(obj));
+    });
+  }
+
   return {
     incomings : incomings,
     outgoings : outgoings,
     read : read,
-    create : create
+    create : create,
+    decline : decline,
+    share : share
   }
 }
