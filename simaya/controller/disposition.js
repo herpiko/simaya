@@ -132,11 +132,29 @@ Disposition = module.exports = function(app) {
                     letter.edit(req.params.id, data, function() {
                       shareDisposition(v._id, function(err) {
                         console.log(err);
-                        utils.render(req, res, 'disposition-create', vals, 'base-authenticated');
+                        if (req.api) {
+                          console.log("1");
+                          if (vals.error) {
+                            res(vals.error);
+                          } else {
+                            res(null);
+                          }
+                        } else {
+                          utils.render(req, res, 'disposition-create', vals, 'base-authenticated');
+                        }
                       });
                     });
                   } else {
-                    utils.render(req, res, 'disposition-create', vals, 'base-authenticated');
+                    if (req.api) {
+                          console.log("2");
+                      if (vals.error) {
+                        res(vals.error);
+                      } else {
+                        res(null);
+                      }
+                    } else {
+                      utils.render(req, res, 'disposition-create', vals, 'base-authenticated');
+                    }
                   }
                 } else {
                   // Should not go here
@@ -150,7 +168,16 @@ Disposition = module.exports = function(app) {
               vals.error = v.errors.Data;  
             }
             
-            utils.render(req, res, 'disposition-create', vals, 'base-authenticated');
+            if (req.api) {
+                          console.log("3");
+              if (vals.error) {
+                res(vals.error);
+              } else {
+                res(null);
+              }
+            } else {
+              utils.render(req, res, 'disposition-create', vals, 'base-authenticated');
+            }
           }
         });
       } else {
@@ -209,7 +236,16 @@ Disposition = module.exports = function(app) {
                     }
                   }
                 }
-                utils.render(req, res, 'disposition-create', vals, 'base-authenticated');
+                if (req.api) {
+                          console.log("4");
+                  if (vals.error) {
+                    res(vals.error);
+                  } else {
+                    res(null);
+                  }
+                } else {
+                  utils.render(req, res, 'disposition-create', vals, 'base-authenticated');
+                }
               });
          
             } else {
@@ -217,15 +253,24 @@ Disposition = module.exports = function(app) {
               vals.unsuccessful = true;
               vals.error = 'Create new disposition failed, not valid letter.';
                   
-              res.redirect('/dispositions');
+              if (req.api) {
+                          console.log("5");
+                res(vals.error);
+              } else {
+                res.redirect('/dispositions');
+              }
             }
           });
         } else {
           // Redirect to disposition list
           vals.unsuccessful = true;
           vals.error = 'Create new disposition failed, not valid letter.';
-              
-          res.redirect('/dispositions');
+          if (req.api) {
+                          console.log("6");
+            res(vals.error);
+          } else {
+            res.redirect('/dispositions');
+          }
         }
       }
     }

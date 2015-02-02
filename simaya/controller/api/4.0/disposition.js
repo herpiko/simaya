@@ -248,9 +248,27 @@ module.exports = function(app){
     });
   }
 
+  var create = function(req, res){
+    console.log(req.body);
+    req.api = true;
+    dispositionWeb.create(req, function(err){
+      var obj = {
+        meta : { code : 200 },
+        data : "Disposition successfuly created."
+      }
+      if (err) {
+        obj.meta.code = 404;
+        obj.meta.errorMessage = err;
+        obj.data = null;
+      }
+      res.send(JSON.stringify(obj));
+    });
+  }
+
   return {
     incomings : incomings,
     outgoings : outgoings,
-    read : read
+    read : read,
+    create : create
   }
 }

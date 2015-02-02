@@ -64,6 +64,7 @@ module.exports = function(app){
   app.get(prefix + "/dispositions/incomings/:params", oauth2.protectedResource, api4.disposition.incomings);
   app.get(prefix + "/dispositions/outgoings", oauth2.protectedResource, api4.disposition.outgoings);
   app.get(prefix + "/dispositions/:id", oauth2.protectedResource, api4.disposition.read);
+  app.post(prefix + "/dispositions/create/:id", oauth2.protectedResource, api4.disposition.create);
 
   // profile
   app.get(prefix + "/profile/view", oauth2.protectedResource, api4.profile.view);
