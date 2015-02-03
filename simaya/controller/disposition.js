@@ -109,6 +109,7 @@ Disposition = module.exports = function(app) {
                 notification.set(req.session.currentUser, item, 'Ada disposisi perihal ' + req.body.disposition.letterTitle, '/disposition/read/' + v._id);
               });
             }
+            console.log("letterId " + req.params.id);
             // Update disposition state
             letter.list({search: { _id: ObjectID(req.params.id) }},
               function(result) {
@@ -158,7 +159,12 @@ Disposition = module.exports = function(app) {
                   }
                 } else {
                   // Should not go here
-                  utils.render(req, res, 'disposition-create', vals, 'base-authenticated');
+                  console.log("should not go here");
+                  if (req.api) {
+                      res("Letter doesn't exists");
+                  } else {
+                    utils.render(req, res, 'disposition-create', vals, 'base-authenticated');
+                  }
                 }
               });
           } else {
@@ -885,23 +891,43 @@ Disposition = module.exports = function(app) {
               sendNotificationComments(req.session.currentUser, result[0].recipients, 0, message, "/disposition/read/" + req.body.dispositionId + "#comments-" + id, function() {
                 if (req.session.currentUser != result[0].sender) {
                   notification.set(req.session.currentUser, result[0].sender, message, "/disposition/read/" + req.body.dispositionId + "#comments-" + id, function() {
-                    res.send(JSON.stringify({result: "OK"}));
+                    if (req.api) {
+                      res(null);
+                    } else {
+                      res.send(JSON.stringify({result: "OK"}));
+                    }
                   })
                 } else {
-                  res.send(JSON.stringify({result: "OK"}));
+                  if (req.api) {
+                    res(null);
+                  } else {
+                    res.send(JSON.stringify({result: "OK"}));
+                  }
                 }
               })
             } else {
-              res.send(JSON.stringify({result: "ERROR"}));
+              if (req.api) {
+                res("ERROR");
+              } else {
+                res.send(JSON.stringify({result: "ERROR"}));
+              }
             }
           });
         } else {
-          res.send(JSON.stringify({result: "ERROR"}));
+          if (req.api) {
+            res("ERROR");
+          } else {
+            res.send(JSON.stringify({result: "ERROR"}));
+          }
         }
       });
 
     } else {
-      res.send(JSON.stringify({result: "ERROR"}));
+      if (req.api) {
+        res("ERROR");
+      } else {
+        res.send(JSON.stringify({result: "ERROR"}));
+      }
     }
   }
 

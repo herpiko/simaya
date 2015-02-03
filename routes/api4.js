@@ -67,6 +67,7 @@ module.exports = function(app){
   app.post(prefix + "/dispositions/create/:id", oauth2.protectedResource, api4.disposition.create);
   app.post(prefix + "/dispositions/decline", oauth2.protectedResource, api4.disposition.decline);
   app.post(prefix + "/dispositions/share", oauth2.protectedResource, api4.disposition.share);
+  app.post(prefix + "/dispositions/comment", oauth2.protectedResource, api4.disposition.comment);
 
   // profile
   app.get(prefix + "/profile/view", oauth2.protectedResource, api4.profile.view);

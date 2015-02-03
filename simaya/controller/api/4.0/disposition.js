@@ -298,6 +298,21 @@ module.exports = function(app){
       res.send(JSON.stringify(obj));
     });
   }
+  var comment = function(req, res){
+    req.api = true; 
+    dispositionWeb.addComments(req, function(err){
+      var obj = {
+        meta : { code : 200 },
+        data : "Disposition successfuly shared."
+      }
+      if (err) {
+        obj.meta.code = 404;
+        obj.meta.errorMessage = err;
+        obj.data = null;
+      }
+      res.send(JSON.stringify(obj));
+    });
+  }
 
   return {
     incomings : incomings,
@@ -305,6 +320,7 @@ module.exports = function(app){
     read : read,
     create : create,
     decline : decline,
-    share : share
+    share : share,
+    comment : comment
   }
 }
