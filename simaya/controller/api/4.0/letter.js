@@ -147,6 +147,7 @@ module.exports = function(app){
     search.fields = { title : 1, date : 1, sender : 1, receivingOrganizations : 1, senderManual : 1, readStates : 1};
     search.page = req.query["page"] || 1;
     search.limit = 20;
+    search.sort["creationDate"] = -1;
     list(search, req, res);
   }
 
