@@ -109,7 +109,6 @@ Disposition = module.exports = function(app) {
                 notification.set(req.session.currentUser, item, 'Ada disposisi perihal ' + req.body.disposition.letterTitle, '/disposition/read/' + v._id);
               });
             }
-            console.log("letterId " + req.params.id);
             // Update disposition state
             letter.list({search: { _id: ObjectID(req.params.id) }},
               function(result) {
@@ -134,7 +133,6 @@ Disposition = module.exports = function(app) {
                       shareDisposition(v._id, function(err) {
                         console.log(err);
                         if (req.api) {
-                          console.log("1");
                           if (vals.error) {
                             res(vals.error);
                           } else {
@@ -147,7 +145,6 @@ Disposition = module.exports = function(app) {
                     });
                   } else {
                     if (req.api) {
-                          console.log("2");
                       if (vals.error) {
                         res(vals.error);
                       } else {
@@ -159,7 +156,6 @@ Disposition = module.exports = function(app) {
                   }
                 } else {
                   // Should not go here
-                  console.log("should not go here");
                   if (req.api) {
                       res("Letter doesn't exists");
                   } else {
@@ -175,7 +171,6 @@ Disposition = module.exports = function(app) {
             }
             
             if (req.api) {
-                          console.log("3");
               if (vals.error) {
                 res(vals.error);
               } else {
@@ -243,7 +238,6 @@ Disposition = module.exports = function(app) {
                   }
                 }
                 if (req.api) {
-                          console.log("4");
                   if (vals.error) {
                     res(vals.error);
                   } else {
@@ -260,7 +254,6 @@ Disposition = module.exports = function(app) {
               vals.error = 'Create new disposition failed, not valid letter.';
                   
               if (req.api) {
-                          console.log("5");
                 res(vals.error);
               } else {
                 res.redirect('/dispositions');
@@ -272,7 +265,6 @@ Disposition = module.exports = function(app) {
           vals.unsuccessful = true;
           vals.error = 'Create new disposition failed, not valid letter.';
           if (req.api) {
-                          console.log("6");
             res(vals.error);
           } else {
             res.redirect('/dispositions');
