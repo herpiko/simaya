@@ -178,6 +178,41 @@ module.exports = function(app){
     search.limit = 20;
     list(search, req, res);
   }
+  
+  var outgoingDraft = function (req, res) {
+    var search = {};
+    search.page = req.query["page"] || 1;
+    /* search.limit = 20; */
+    search.sort = {
+      type : "",
+      dir : 0
+    };
+    var obj = {
+      meta : {},
+      data : []
+    }
+    var me = req.session.currentUser;
+    letter.listDraftLetter(me, search, function(err, result){
+      if (result == null) {
+        
+        obj.meta.code = 404;
+        obj.meta.errorMessage = "Letters Not Found";
+        return res.send(obj.meta.code, obj);
+      }
+      result.data.forEach(function(item){
+        // trim the objects
+        data = {
+          _id : item._id,
+          date : item.creationDate,
+          recipients : item.recipients,
+          title : item.title,
+          sender : item.sender
+        } 
+        obj.data.push(data);
+      });
+      res.send(obj);
+    });
+  }
 
   /**
    * @api {get} /letter/read/:id Read a letter or agenda
@@ -809,6 +844,7 @@ module.exports = function(app){
   return {
     incomings : incomings,
     outgoings : outgoings,
+    outgoingDraft : outgoingDraft,
     read : read,
     sendLetter: sendLetter,
 
