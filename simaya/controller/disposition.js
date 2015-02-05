@@ -807,7 +807,6 @@ Disposition = module.exports = function(app) {
   var decline = function(req, res) {
     if (req.body && req.body.dispositionId && req.body.message) {
 
-          console.log("idnya" + req.body.dispositionId);
       var search = {
         search: {
           _id: ObjectID(req.body.dispositionId),
@@ -815,10 +814,8 @@ Disposition = module.exports = function(app) {
       }
       disposition.list(search, function(result) { 
         if (result != null && result.length == 1) {
-          console.log("disposisi ada");
           disposition.markAsDeclined(ObjectID(req.body.dispositionId), req.session.currentUser, req.body.message, function(ok) {
             if (ok) {
-          console.log("ok");
               notification.set(req.session.currentUser, result[0].sender, req.session.currentUserProfile.fullName + ' menolak disposisi dari Anda.', '/disposition/read/' + req.body.dispositionId + "#recipient-" + req.session.currentUser);
               if (req.api) {
                 res(null);
@@ -826,7 +823,6 @@ Disposition = module.exports = function(app) {
                 res.send(JSON.stringify({result: "OK"}));
               }
             } else {
-          console.log("not ok");
               if (req.api) {
                 res("error");
               } else {
@@ -835,7 +831,6 @@ Disposition = module.exports = function(app) {
             }
           });
         } else {
-          console.log("what");
           if (req.api) {
             res("error");
           } else {
@@ -845,7 +840,6 @@ Disposition = module.exports = function(app) {
       });
 
     } else {
-          console.log("ah");
       if (req.api) {
         res("error");
       } else {

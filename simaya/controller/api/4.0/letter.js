@@ -182,7 +182,7 @@ module.exports = function(app){
   var outgoingDraft = function (req, res) {
     var search = {};
     search.page = req.query["page"] || 1;
-    /* search.limit = 20; */
+    search.limit = 20;
     search.sort = {
       type : "",
       dir : 0
