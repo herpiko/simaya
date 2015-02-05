@@ -39,7 +39,7 @@ module.exports = function(app){
   app.get(prefix + "/letters/incomings/:params", oauth2.protectedResource, api4.letter.incomings);
   app.get(prefix + "/letters/outgoings", oauth2.protectedResource, api4.letter.outgoings);
   app.get(prefix + "/letters/outgoings-draft", oauth2.protectedResource, api4.letter.outgoingDraft);
-  /* app.get(prefix + "/letters/outgoings/cancel", oauth2.protectedResource, api4.letter.outgoingCancel); */
+  app.get(prefix + "/letters/outgoings-cancel", oauth2.protectedResource, api4.letter.outgoingCancel);
   app.get(prefix + "/letters/sender-selection", oauth2.protectedResource, api4.letter.senderSelection);
   app.get(prefix + "/letters/recipient-organization-selection", oauth2.protectedResource, api4.letter.orgSelection);
   app.get(prefix + "/letters/recipient-candidates-selection", oauth2.protectedResource, api4.letter.recipientCandidatesSelection);

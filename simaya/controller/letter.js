@@ -1243,12 +1243,20 @@ Letter = module.exports = function(app) {
                     }
                   }
                 }
-                utils.render(req, res, template, vals, "base-authenticated");
+                if (req.api) {
+                  res(res);
+                } else {
+                  utils.render(req, res, template, vals, "base-authenticated");
+                }
               })
             } else {
               dispositionController.listOutgoingBase(req, res, {}, function(req, res, output) {
                 vals.dispositionsList = output;
-                utils.render(req, res, template, vals, "base-authenticated");
+                if (req.api) {
+                  res(res);
+                } else {
+                  utils.render(req, res, template, vals, "base-authenticated");
+                }
               })
             }
           }
