@@ -2619,6 +2619,7 @@ Letter = module.exports = function(app) {
 
   // @api {post} Creates a letter.
   var postLetter = function(req, res) {
+    console.log(req.body);
     var data = req.body || {};
 
     if (data.operation == "manual-incoming" && data._id) {

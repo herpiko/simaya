@@ -515,6 +515,7 @@ module.exports = function(app){
    * curl -d "letter%5Bsender%5D=presiden.ri&letter%5Brecipients%5D=ketua.mpr&letter%5Btitle%5D=Jajal+api&letter%5Bclassification%5D=1&letter%5Bpriority%5D=1&letter%5Btype%5D=2&letter%5Bdate%5D=2014-03-05T08%3A37%3A30.956Z" http://ayam.vps1.kodekreatif.co.id/api/2/letters/new?access_token=f3fyGRRoKZ...
    */
   var sendLetter = function(req, res) {
+    console.log(req.body);
     var vals = {
       jsonRequest: true
     };
