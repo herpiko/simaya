@@ -91,7 +91,7 @@ module.exports = function(app){
     result.forEach(function(e, i) {
       senders[result[i].sender] = 1; 
       result[i].rawDate = result[i].date;
-      result[i].date = moment(result[i].date).format("dddd, DD MMMM YYYY");
+      result[i].date = moment(result[i].date).format("DD MMM YYYY");
       if (result[i].receivingOrganizations[org]) {
         result[i].incomingAgenda = result[i].receivingOrganizations[org].agenda;
         if (result[i].receivingOrganizations[org].status == letter.Stages.RECEIVED) {

@@ -264,6 +264,19 @@ module.exports = function(app) {
         callback(false); 
       });
     },
+    
+    // Get fullName of specified username
+    // Returns a callback:
+    //    result: a full name if user is available
+    getFullName: function(user, callback) {
+      db.findOne({username:user}, function(err, item) { 
+        if (err == null && item != null) {
+          callback(item.profile.fullName); 
+          return;
+        }
+        callback(false); 
+      });
+    },
 
     // Checks activitity status of a specified user
     // Returns a callback:

@@ -3,8 +3,9 @@ module.exports = function(app){
   var letterAPI = require("../1.0/letter")(app);
   var letterWeb = require("../../letter.js")(app);
   var letter = require("../../../models/letter.js")(app);
-  var cUtils = require("../../utils.js")(app)
-  var orgWeb = require("../../organization.js")(app)
+  var cUtils = require("../../utils.js")(app);
+  var orgWeb = require("../../organization.js")(app);
+  var moment = require("moment");
 
   function isValidObjectID(str) {
     str = str + '';
@@ -203,7 +204,7 @@ module.exports = function(app){
         // trim the objects
         data = {
           _id : item._id,
-          date : item.creationDate,
+          date : moment(item.creationDate).format("DD MMM YYYY"),
           recipients : item.recipients,
           title : item.title,
           sender : item.sender
@@ -236,7 +237,8 @@ module.exports = function(app){
       meta : {},
       data : []
     }
-    letter.list(null, "letter-outgoing-cancel", {search: search}, req, function(result){
+    vals = {};
+    letterWeb.list(vals, "letter-outgoing-cancel", {search: search}, req, function(result){
       if (result == null) {
         
         obj.meta.code = 404;
@@ -884,6 +886,11 @@ module.exports = function(app){
     });
   }
 
+  var createLetter = function(req, res) {
+    req.api = true;
+   letterWeb.simpleEdit(req, res);
+  
+  }
 
 
   return {
@@ -910,6 +917,8 @@ module.exports = function(app){
 
     linkLetter: linkLetter,
 
-    constants : constants
+    constants : constants,
+
+    createLetter : createLetter
   }
 }

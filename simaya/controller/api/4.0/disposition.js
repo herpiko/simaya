@@ -5,6 +5,7 @@ module.exports = function(app){
   var dispositionWeb = require("../../disposition.js")(app)
   var disposition = require("../../../models/disposition.js")(app)
   var letterUtils = require("../../../models/utils.js")(app)
+  var user = require("../../../../sinergis/models/user.js")(app)
 
   function isValidObjectID(str) {
     str = str + '';
@@ -36,6 +37,7 @@ module.exports = function(app){
    * curl http://ayam.vps1.kodekreatif.co.id/api/2/dispositions/outgoings?access_token=f3fyGRRoKZ...
    */
   var outgoings = function(req, res) {
+    req.option = "outgoing";
     var me = req.session.currentUser;
     var search = {
       search: {
@@ -103,13 +105,18 @@ module.exports = function(app){
         }
         recipientHash[r[i].sender] = 1;
         if (r[i].letterDate) {
-          r[i].letterDate = moment(r[i].letterDate).format("DD/MM/YYYY");
+          r[i].letterDate = moment(r[i].letterDate).format("DD MMM YYYY");
         }
+        r[i].recipientList = []
         for (var j = 0; j < r[i].recipients.length; j++) {
           recipientHash[r[i].recipients[j].recipient] = 1;
           r[i].recipients[j]['priority' + r[i].recipients[j].priority] = true;
           r[i].recipients[j]['security' + r[i].recipients[j].security] = true;
-
+          user.getFullName(r[i].recipients[j].recipient, function(fullName){
+            console.log("get fullname " + fullName);
+            r[i].recipientList.push(fullName);
+            console.log(r[i].recipientList);
+          });
           // For incoming
           if (r[i].recipients[j].recipient == me) {
             r[i].completionDate = moment(r[i].recipients[j].date).format("DD/MM/YYYY");

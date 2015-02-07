@@ -2547,6 +2547,8 @@ Letter = module.exports = function(app) {
   };
 
   var simpleEdit = function(req, res) {
+    console.log("simpleEdit");
+    console.log(req.body);
     var data = req.body;
 
     data.originator = req.session.currentUser;
@@ -2561,10 +2563,18 @@ Letter = module.exports = function(app) {
     letter.editLetter({_id: ObjectID(data._id)}, data, function(err, result) {
       var done = function(err, result) {
         if (err) {
-          console.log(err)
-          res.send(500, result);
+          console.log(err);
+          if (req.api) {
+            res(err);
+          } else {
+            res.send(500, result);
+          }
         } else {
-          res.send(result);
+          if (req.api) {
+            res(result);
+          } else {
+            res.send(result);
+          }
         }
       }
       if (linkedLetters.length > 0) {
@@ -2619,6 +2629,7 @@ Letter = module.exports = function(app) {
 
   // @api {post} Creates a letter.
   var postLetter = function(req, res) {
+    console.log("post letter");
     console.log(req.body);
     var data = req.body || {};
 
@@ -2738,6 +2749,7 @@ Letter = module.exports = function(app) {
     , getContent : getContent
     , allReviewers: allReviewers
     , contentPdf : contentPdf
+    , simpleEdit : simpleEdit
   }
 };
 }
