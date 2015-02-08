@@ -185,13 +185,15 @@ module.exports = function(app){
         return res.send(obj.meta.code, obj);
       }
       result.forEach(function(item){
+        console.log(item);
         // trim the objects
         data = {
           _id : item._id,
           date : moment(item.creationDate).format("DD MMM YYYY"),
           recipients : item.recipients,
           title : item.title,
-          sender : item.sender
+          sender : item.sender,
+          readStates : item.readStates
         } 
         obj.data.push(data);
       });
@@ -392,6 +394,9 @@ module.exports = function(app){
     options.myOrganization = myOrganization;
 
     letter.listIncomingLetter(me, options, function(err, result) {
+      result.data.forEach(function(letter){
+        letter.date = moment(letter.date).format("DD MMM YYYY");
+      });
       res.send(result);
     });
   }
@@ -437,6 +442,9 @@ module.exports = function(app){
     options.fields = {title:1, date:1, sender: 1, receivingOrganizations: 1, senderManual:1, readStates: 1, outgoingAgenda:1};
 
     letter.listOutgoingLetter(me, options, function(err, result) {
+      result.data.forEach(function(letter){
+        letter.date = moment(letter.date).format("DD MMM YYYY");
+      });
       res.send(result);
     });
   }
