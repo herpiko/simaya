@@ -113,9 +113,7 @@ module.exports = function(app){
           r[i].recipients[j]['priority' + r[i].recipients[j].priority] = true;
           r[i].recipients[j]['security' + r[i].recipients[j].security] = true;
           user.getFullName(r[i].recipients[j].recipient, function(fullName){
-            console.log("get fullname " + fullName);
             r[i].recipientList.push(fullName);
-            console.log(r[i].recipientList);
           });
           // For incoming
           if (r[i].recipients[j].recipient == me) {
@@ -256,7 +254,6 @@ module.exports = function(app){
   }
 
   var create = function(req, res){
-    console.log(req.body);
     req.api = true;
     dispositionWeb.create(req, function(err){
       var obj = {
@@ -273,7 +270,6 @@ module.exports = function(app){
   }
 
   var decline = function(req, res){
-    console.log(req.body);
     req.api = true;
     dispositionWeb.decline(req, function(err){
       var obj = {
@@ -290,7 +286,6 @@ module.exports = function(app){
   }
   
   var share = function(req, res){
-    console.log(req.body);
     req.api = true;
     dispositionWeb.share(req, function(err){
       var obj = {

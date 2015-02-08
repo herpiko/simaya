@@ -140,7 +140,6 @@ module.exports = function(app){
    * curl http://ayam.vps1.kodekreatif.co.id/api/2/letters/incomings?access_token=f3fyGRRoKZ...
    */
   var incomings = function (req, res) {
-    console.log(req.params);
     if (req.params['params'] === "cc") {
       req.cc = true;
     }
@@ -175,17 +174,11 @@ module.exports = function(app){
    */
   var outgoings = function (req, res) {
     req.api = true;
-    /* var search = letterWeb.buildSearchForOutgoing(req, res); */ 
-    /* search.fields = {title: 1, date: 1, sender: 1, receivingOrganizations: 1, senderManual: 1, readStates: 1}; */
-    /* search.page = req.query["page"] || 1; */
-    /* search.limit = 20; */
-    /* list(search, req, res); */
     var obj = {
       meta : {},
       data : []
     }
     letterWeb.listOutgoing(req, function(result){
-      console.log(result);
       if (result == null) {
         obj.meta.code = 404;
         obj.meta.errorMessage = "Letters Not Found";
@@ -389,7 +382,6 @@ module.exports = function(app){
       type: sortOptions["string"] || "",
       dir: parseInt(sortOptions["dir"]) || 0
     }
-    console.log(JSON.stringify(req.query, null, "  "));
     if (req.query && req.query.search) {
       options.search = req.query.search;
     }
@@ -543,7 +535,6 @@ module.exports = function(app){
    * curl -d "letter%5Bsender%5D=presiden.ri&letter%5Brecipients%5D=ketua.mpr&letter%5Btitle%5D=Jajal+api&letter%5Bclassification%5D=1&letter%5Bpriority%5D=1&letter%5Btype%5D=2&letter%5Bdate%5D=2014-03-05T08%3A37%3A30.956Z" http://ayam.vps1.kodekreatif.co.id/api/2/letters/new?access_token=f3fyGRRoKZ...
    */
   var sendLetter = function(req, res) {
-    console.log(req.body);
     var vals = {
       jsonRequest: true
     };
@@ -552,7 +543,6 @@ module.exports = function(app){
         meta: {
         }
       }
-      console.log(data);
       if (data.status == "ERROR" || data.result == "ERROR") {
         obj.meta.code = 400;
         obj.meta.data = "Invalid parameters: " + data.data.error;
@@ -677,7 +667,6 @@ module.exports = function(app){
   var recipientCandidatesSelection = function(req, res) {
     var r = ResWrapperJSONParse(function(vals) {
       if (vals) {
-        console.log(vals);
         var obj = {
           meta: {
             code: 200
@@ -715,7 +704,6 @@ module.exports = function(app){
   var ccCandidatesSelection = function(req, res) {
     var r = ResWrapperJSONParse(function(vals) {
       if (vals) {
-        console.log(vals);
         var obj = {
           meta: {
             code: 200
@@ -752,7 +740,6 @@ module.exports = function(app){
   var reviewerCandidatesSelection = function(req, res) {
     var r = ResWrapperJSONParse(function(vals) {
       if (vals) {
-        console.log(vals);
         var obj = {
           meta: {
             code: 200
@@ -798,7 +785,6 @@ module.exports = function(app){
       } else {
         obj.meta.code = data.code;
       }
-      console.log(data.code);
       res.send(obj);
     });
     letterWeb.reject(req, r);
