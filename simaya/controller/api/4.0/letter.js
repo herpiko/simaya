@@ -6,6 +6,7 @@ module.exports = function(app){
   var cUtils = require("../../utils.js")(app);
   var orgWeb = require("../../organization.js")(app);
   var moment = require("moment");
+  var user = require("../../../../sinergis/models/user.js")(app);
 
   function isValidObjectID(str) {
     str = str + '';
@@ -173,11 +174,36 @@ module.exports = function(app){
    * curl http://ayam.vps1.kodekreatif.co.id/api/2/letters/outgoings?access_token=f3fyGRRoKZ...
    */
   var outgoings = function (req, res) {
-    var search = letterWeb.buildSearchForOutgoing(req, res); 
-    search.fields = {title: 1, date: 1, sender: 1, receivingOrganizations: 1, senderManual: 1, readStates: 1};
-    search.page = req.query["page"] || 1;
-    search.limit = 20;
-    list(search, req, res);
+    req.api = true;
+    /* var search = letterWeb.buildSearchForOutgoing(req, res); */ 
+    /* search.fields = {title: 1, date: 1, sender: 1, receivingOrganizations: 1, senderManual: 1, readStates: 1}; */
+    /* search.page = req.query["page"] || 1; */
+    /* search.limit = 20; */
+    /* list(search, req, res); */
+    var obj = {
+      meta : {},
+      data : []
+    }
+    letterWeb.listOutgoing(req, function(result){
+      console.log(result);
+      if (result == null) {
+        obj.meta.code = 404;
+        obj.meta.errorMessage = "Letters Not Found";
+        return res.send(obj.meta.code, obj);
+      }
+      result.forEach(function(item){
+        // trim the objects
+        data = {
+          _id : item._id,
+          date : moment(item.creationDate).format("DD MMM YYYY"),
+          recipients : item.recipients,
+          title : item.title,
+          sender : item.sender
+        } 
+        obj.data.push(data);
+      });
+      res.send(obj);
+    });
   }
   
   var outgoingDraft = function (req, res) {

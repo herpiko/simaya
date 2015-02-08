@@ -1504,10 +1504,18 @@ Letter = module.exports = function(app) {
           console.log(req.query.search);
           vals.searchQuery = req.query.search;
         }
-        utils.render(req, res, vals.action, vals, "base-authenticated");
+        if (req.api) {
+          res(result.data);
+        } else {
+          utils.render(req, res, vals.action, vals, "base-authenticated");
+        }
       });
     } else {
-      res.send(404);
+      if (req.api) {
+        res(null);
+      } else {
+        res.send(404);
+      }
     }
   }
 
