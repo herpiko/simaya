@@ -100,11 +100,19 @@ module.exports = function(app) {
     }
   }
 
+  var read = function(id, callback) {
+    var id = ObjectID(id + "");
+    list({search: { _id: id}}, function(result) {
+      callback(result);
+    });
+  }
+
   return {
     insert: insert,
     list: list,
     comment: comment,
     love: love,
     unlove: unlove,
+    read : read
   }
 };

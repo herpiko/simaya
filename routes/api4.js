@@ -26,9 +26,13 @@ module.exports = function(app){
   
   app.get(prefix + "/letters/constants", oauth2.protectedResource, api4.letter.constants);
 
-  // users
+  // timeline
   app.get(prefix + "/timeline/timeline", oauth2.protectedResource, api4.timeline.timeline);
+  app.get(prefix + "/timeline/view/:id", oauth2.protectedResource, api4.timeline.view);
   
+  // ob
+  app.get(prefix + "/ob/get/:id", oauth2.protectedResource, api4.ob.simpleDownload);
+
   // users
   app.get(prefix + "/users/self", oauth2.protectedResource, api4.user.self);
   app.get(prefix + "/users/:id", oauth2.protectedResource, api4.user.info);

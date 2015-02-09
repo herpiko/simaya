@@ -10,6 +10,7 @@ module.exports = function(app){
   var contacts = require("./contacts")(app);
   var organization = require("./organization")(app);
   var timeline = require("./timeline")(app);
+  var ob = require("./ob")(app);
 
   return {
     say : say,
@@ -21,6 +22,7 @@ module.exports = function(app){
     notification : notification, 
     contacts : contacts,
     organization : organization,
-    timeline : timeline
+    timeline : timeline,
+    ob : ob
   }
 }
