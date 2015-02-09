@@ -10,7 +10,7 @@ module.exports = function(app) {
   var index = function(req, res)
   {
     var vals = {};
-    utils.render(req, res, "timeline", vals, "base-authenticated"); 
+    utils.render(req, res, "timeline", vals, "base-authenticated");
   }
 
   var post = function(req, res) 
@@ -150,11 +150,19 @@ module.exports = function(app) {
           data.search["_id"] = ObjectID(req.query.id + "");
         }
         timeline.list(data, function(result) {
-          res.send(result);
+          if (req.api) {
+            res(result);
+          } else {
+            res.send(result);
+          }
         });
       });
     } else {
-      res.send([]);
+      if (req.api) {
+        res(null);
+      } else {
+        res.send([]);
+      }
     }
   }
 
