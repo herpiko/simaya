@@ -29,6 +29,10 @@ module.exports = function(app){
   // timeline
   app.get(prefix + "/timeline/timeline", oauth2.protectedResource, api4.timeline.timeline);
   app.get(prefix + "/timeline/view/:id", oauth2.protectedResource, api4.timeline.view);
+  app.post(prefix + "/timeline/post", oauth2.protectedResource, api4.timeline.post);
+  app.post(prefix + "/timeline/postComment", oauth2.protectedResource, api4.timeline.postComment);
+  app.post(prefix + "/timeline/love", oauth2.protectedResource, api4.timeline.love);
+  app.post(prefix + "/timeline/unlove", oauth2.protectedResource, api4.timeline.unlove);
   
   // ob
   app.get(prefix + "/ob/get/:id", oauth2.protectedResource, api4.ob.simpleDownload);
