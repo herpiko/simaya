@@ -1,6 +1,7 @@
 module.exports = function(app){
   var atok = require("../../../models/oauth2/accessToken")(app);
   var user = require('../../../../sinergis/models/user')(app);
+  var profileWeb = require('../../profile.js')(app);
   var ObjectID = app.ObjectID;
 
   function isValidObjectID(str) {
@@ -151,6 +152,15 @@ module.exports = function(app){
     });
   }
   var getAvatar = function(req, res) {
+    req.query = {
+      username : req.params.id
+    }
+    profileWeb.getAvatarStream(req, res);
+  }
+  var getAvatarBase64 = function(req, res) {
+    req.query = {
+      username : req.params.id
+    }
     profileWeb.getAvatarBase64Stream(req, res);
   }
 
@@ -158,6 +168,7 @@ module.exports = function(app){
     self : self,
     info : info,
     logout : logout,
-    getAvatar : getAvatar
+    getAvatar : getAvatar,
+    getAvatarBase64 : getAvatarBase64
   }
 }
