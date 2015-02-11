@@ -39,8 +39,9 @@ module.exports = function(app){
 
   // users
   app.get(prefix + "/users/self", oauth2.protectedResource, api4.user.self);
-  app.get(prefix + "/users/:id", oauth2.protectedResource, api4.user.info);
+  app.get(prefix + "/users/avatar/:id", oauth2.protectedResource, api4.user.getAvatar);
   app.get(prefix + "/users/logout/:id", oauth2.protectedResource, api4.user.logout);
+  app.get(prefix + "/users/:id", oauth2.protectedResource, api4.user.info);
   
   app.get(prefix + "/organization/list", oauth2.protectedResource, api4.organization.list);
   app.get(prefix + "/organization/people", oauth2.protectedResource, api4.organization.people);

@@ -150,10 +150,14 @@ module.exports = function(app){
       });
     });
   }
+  var getAvatar = function(req, res) {
+    profileWeb.getAvatarBase64Stream(req, res);
+  }
 
   return {
     self : self,
     info : info,
-    logout : logout
+    logout : logout,
+    getAvatar : getAvatar
   }
 }
