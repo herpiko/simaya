@@ -1,6 +1,7 @@
 module.exports = function(app) {
   var db = app.db.collection? app.db.collection("obFile") : app.db("obFile");
   var fs = require("fs");
+  var base64Stream = require("base64-stream");
   var Errors = {
     NONE: 0,
     DB: 1,
@@ -93,6 +94,27 @@ module.exports = function(app) {
       gridStream.pipe(stream);
     })
   }
+  
+  var realDownloadBase64 = function(id, metadata, stream, callback) {
+    if (stream.attachment) {
+      stream.attachment(metadata.name);
+    }
+    if (stream.contentType) {
+      stream.contentType(metadata.type);
+    }
+    var store = app.store(id, "r");
+    store.open(function(e, grid) {
+      if (e) {
+        callback(error(Errors.GRID_NOT_FOUND, e));
+        return;
+      }
+      var gridStream = grid.stream(true);
+      gridStream.on("end", function() {
+        callback(null);
+      });
+      gridStream.pipe(base64Stream.encode()).pipe(stream);
+    })
+  }
 
   /* PUBLIC */
 
@@ -179,10 +201,32 @@ module.exports = function(app) {
       realDownload(itemId, item, stream, callback);
     });
   }
+  
+  var downloadBase64 = function(id, seq, stream, callback) {
+    db.findOne({_id: app.ObjectID(id + "")}, function(e, item) {
+      if (item == null) {
+        callback(error(Errors.FILE_NOT_FOUND, e));
+        return;
+      }
+      if (seq < 0 || (seq > 0 && item.history.length > seq)) {
+        callback(error(Errors.SEQ_NOT_FOUND, e));
+        return;
+      }
+      var itemId;
+      if (seq == 0) {
+        itemId = item.history[0].id;
+      } else {
+        itemId = item.history[seq - 1].id;
+      }
+
+      realDownloadBase64(itemId, item, stream, callback);
+    });
+  }
 
   return {
     upload: upload
   , simplePublicUpload: simplePublicUpload
   , download: download
+  , downloadBase64: downloadBase64
   }
 }

@@ -7,9 +7,9 @@ module.exports = function(app) {
       res.send("<script>window.parent.CKEDITOR.tools.callFunction(" + func + ", '" + image + "')</script>");
     });
   }
-  
+  // return a base64 string of file 
   var simpleDownload = function(req, res) {
-    ob.download(req.params.id, 0, res, function() {
+    ob.downloadBase64(req.params.id, 0, res, function() {
       res.end();
     });
   }
