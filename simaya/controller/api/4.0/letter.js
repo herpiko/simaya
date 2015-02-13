@@ -505,6 +505,21 @@ module.exports = function(app){
 
   var attachmentStream = function (req, res) {
     // TODO: stream the attachment, depends on its mime type
+    var vals = {};
+    if (req.params.id) {
+      letter.downloadAttachment({
+        protocol: req.protocol,
+        host: req.host,
+        username: req.session.currentUser,
+        id: req.params.id,
+        stream: res,
+        base64 : true,
+      }, function() {
+        res.end();
+      });
+    } else {
+      res.send(500);
+    }
   }
 
   /**

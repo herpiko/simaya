@@ -60,6 +60,7 @@ module.exports = function(app){
   app.get(prefix + "/letters/cc-candidates-selection", oauth2.protectedResource, api4.letter.ccCandidatesSelection);
   app.get(prefix + "/letters/reviewer-candidates-selection", oauth2.protectedResource, api4.letter.reviewerCandidatesSelection);
   app.post(prefix + "/letters/reject", oauth2.protectedResource, api4.letter.rejectLetter);
+  app.get(prefix + "/letters/attachment/:id", oauth2.protectedResource, api4.letter.attachmentStream);
   app.get(prefix + "/letters/:id", oauth2.protectedResource, api4.letter.read);
   app.get(prefix + "/letters/:id/documents", oauth2.protectedResource, api4.letter.attachments);
   app.post(prefix + "/letters/:id/link", oauth2.protectedResource, api4.letter.linkLetter);

@@ -18,6 +18,7 @@ module.exports = function(app) {
   var PdfDocument = require("pdfkit");
   var spawn = require('child_process').spawn;
   var printControlDb = require("./print-control")(app);
+  var base64Stream = require("base64-stream");
 
   // stages of sending
   var stages = {
@@ -2457,6 +2458,9 @@ module.exports = function(app) {
     downloadAttachment: function(options, callback) {
       var fileId = options.id;
       var stream = options.stream;
+      var base64 = options.base64;
+      console.log("model" + fileId);
+      
       // Find letter title for this file
       db.findOne({'fileAttachments.path': ObjectID(fileId)}, {fileAttachments: 1, _id: 1}, function(error, item){
         if (item != null) {
@@ -2477,6 +2481,7 @@ module.exports = function(app) {
                 }
                 var gridStream = gridStore.stream(true);
                 if (/\.pdf$/.test(e.name)) {
+                  console.log("pdf");
                   // Embed qr code on pdf files
                   var inputFile = ("/tmp/" + e.name).replace(/ /g, "-");
                   var pdfStream = fs.createWriteStream(inputFile);
@@ -2492,16 +2497,24 @@ module.exports = function(app) {
                       callback(err);
                     });
                   });
-                  gridStream.pipe(pdfStream);
-
+                  /* if (base64) { */
+                  /*   gridStream.pipe(base64Stream.encode()).pipe(pdfStream); */
+                  /* } else { */
+                    gridStream.pipe(pdfStream);
+                  /* } */
                 } else {
+                  console.log("image");
                   gridStream.on("error", function(error) {
                     if (callback) return callback(error);
                   });
                   gridStream.on("end", function() {
                     if (callback) callback(null);
                   });
-                  gridStream.pipe(stream);
+                  if (base64) {
+                    gridStream.pipe(base64Stream.encode()).pipe(stream);
+                  } else {
+                    gridStream.pipe(stream);
+                  }
                 }
               });
             }
