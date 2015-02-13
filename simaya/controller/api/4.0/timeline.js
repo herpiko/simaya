@@ -7,6 +7,7 @@ module.exports = function(app){
   var orgWeb = require("../../organization.js")(app);
   var moment = require("moment");
   var user = require("../../../../sinergis/models/user.js")(app);
+  var ob = require("../../../../ob/file.js")(app);
 
   var timeline = function(req, res) {
     req.api = true;
@@ -22,9 +23,8 @@ module.exports = function(app){
         obj.meta.errorMessage = "Timeline is Empty";
         return res.send(obj.meta.code, obj);
       } else {
-        result.reverse();
+        result.reverse().splice(10);
         result.forEach(function(item){
-          console.log(item);
           // trim the objects
           data = {
             _id : item._id,
@@ -42,7 +42,23 @@ module.exports = function(app){
       res.send(obj);
     })
   }
-  
+ 
+  timelineUpload = function(req, res){
+    // cordovaFileTransfer are using file instead of upload
+    req.files.upload = req.files.file;
+    var fileType = req.files.upload.name.split(".")[req.files.upload.name.split(".").length-1];
+    var acceptFileTypes = /^(jpe?g|png)$/i;
+    console.log(fileType);
+    if (typeof(fileType) != undefined && acceptFileTypes.test(fileType)) {
+      ob.simplePublicUpload(req.files.upload, "/timeline/status", function(e, r) {
+        var image = "/ob/get/" + r._id;
+        res.send({path: image})
+      });
+    } else {
+      res.send({error: "invalid-file-type"})
+    }
+    
+  }
   var view = function(req, res){
     timelineModel.read(req.params.id, function(result){
       var obj = {
@@ -211,6 +227,7 @@ module.exports = function(app){
     post : post,
     postComment : postComment,
     love : love,
-    unlove : unlove
+    unlove : unlove,
+    timelineUpload : timelineUpload
   }
 }

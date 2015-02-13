@@ -136,7 +136,6 @@ module.exports = function(app) {
             friends.push(user);
           }
         }
-
         var data = {
           search: {
             user: {$in: friends}
