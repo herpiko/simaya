@@ -408,7 +408,6 @@ module.exports = function(app) {
   }
 
   var getAvatarStreamBase = function(base64, req, res) {
-    console.log(JSON.stringify(req.query));
     if (req.query && req.query.username) {
       downloadAvatar(base64, req, res);
     } else {

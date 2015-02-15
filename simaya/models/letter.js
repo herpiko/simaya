@@ -2459,7 +2459,6 @@ module.exports = function(app) {
       var fileId = options.id;
       var stream = options.stream;
       var base64 = options.base64;
-      console.log("model" + fileId);
       
       // Find letter title for this file
       db.findOne({'fileAttachments.path': ObjectID(fileId)}, {fileAttachments: 1, _id: 1}, function(error, item){
@@ -2481,7 +2480,6 @@ module.exports = function(app) {
                 }
                 var gridStream = gridStore.stream(true);
                 if (/\.pdf$/.test(e.name)) {
-                  console.log("pdf");
                   // Embed qr code on pdf files
                   var inputFile = ("/tmp/" + e.name).replace(/ /g, "-");
                   var pdfStream = fs.createWriteStream(inputFile);
@@ -2503,7 +2501,6 @@ module.exports = function(app) {
                     gridStream.pipe(pdfStream);
                   /* } */
                 } else {
-                  console.log("image");
                   gridStream.on("error", function(error) {
                     if (callback) return callback(error);
                   });

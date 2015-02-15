@@ -3,8 +3,6 @@ module.exports = function(app){
   /* var letterAPI = require("../1.0/letter")(app); */
   var timelineWeb = require("../../timeline.js")(app);
   var timelineModel = require("../../../models/timeline.js")(app);
-  var cUtils = require("../../utils.js")(app);
-  var orgWeb = require("../../organization.js")(app);
   var moment = require("moment");
   var user = require("../../../../sinergis/models/user.js")(app);
   var ob = require("../../../../ob/file.js")(app);
@@ -48,7 +46,6 @@ module.exports = function(app){
     req.files.upload = req.files.file;
     var fileType = req.files.upload.name.split(".")[req.files.upload.name.split(".").length-1];
     var acceptFileTypes = /^(jpe?g|png)$/i;
-    console.log(fileType);
     if (typeof(fileType) != undefined && acceptFileTypes.test(fileType)) {
       ob.simplePublicUpload(req.files.upload, "/timeline/status", function(e, r) {
         var image = "/ob/get/" + r._id;
@@ -113,7 +110,6 @@ module.exports = function(app){
       if (req.body.attachment) {
         data.attachment = req.body.attachment;
       }
-      console.log(data);
       timelineModel.insert(data, function(err, id) {
         if (err) {
           obj.meta.code = 404;
@@ -148,7 +144,6 @@ module.exports = function(app){
       if (req.body.attachment) {
         data.attachment = req.body.attachment;
       }
-      console.log(data);
       timelineModel.comment(data, function(result) {
         if (result == null) {
           obj.meta.code = 404;
