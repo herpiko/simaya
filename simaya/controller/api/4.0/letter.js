@@ -926,6 +926,17 @@ module.exports = function(app){
    letterWeb.simpleEdit(req, res);
   
   }
+  var attachmentMetadata = function(req, res) {
+    console.log("attachmentMetadata");
+    req.api = true;
+    letter.getDocumentMetadata(req.params.id, res);
+  }
+
+  var attachmentRender = function(req, res) {
+    data = req.params[0].split("/");
+    console.log(data);
+    letter.renderDocumentPageBase64(data[0], parseInt(data[1]), res);
+  }
 
 
   return {
@@ -939,6 +950,8 @@ module.exports = function(app){
     attachments : attachments,
     attachment : attachment,
     attachmentStream : attachmentStream,
+    attachmentMetadata : attachmentMetadata,
+    attachmentRender : attachmentRender,
 
     agendaIncomings : agendaIncomings,
     agendaOutgoings : agendaOutgoings,
@@ -949,11 +962,8 @@ module.exports = function(app){
     ccCandidatesSelection : ccCandidatesSelection,
     reviewerCandidatesSelection : reviewerCandidatesSelection,
     rejectLetter : rejectLetter,
-
     linkLetter: linkLetter,
-
     constants : constants,
-
-    createLetter : createLetter
+    createLetter : createLetter,
   }
 }
