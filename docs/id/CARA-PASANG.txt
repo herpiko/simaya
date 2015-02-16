@@ -1,7 +1,7 @@
 === Instalasi Aplikasi siMAYA
 
 --- Install kebutuhan paket dependensi untuk deploy siMAYA
-$ sudo aptitude install mongodb-server curl libssl-dev build-essential libpoppler-glib-dev libpoppler-glib8 libcairo2-dev libcairo2 unzip libjpeg8-dev libpango1.0-dev libgif-dev g++ gearman uuid-runtime pdftk graphicsmagick
+$ sudo aptitude install mongodb-server curl libssl-dev build-essential libpoppler-glib-dev libpoppler-glib8 libcairo2-dev libcairo2 unzip libjpeg8-dev libpango1.0-dev libgif-dev g++ gearman uuid-runtime pdftk graphicsmagick xpdf
 
 --- Buat direktori baru untuk lokasi install nodejs
 $ mkdir ~/local
@@ -18,7 +18,7 @@ $ export NODE_VERSION='0.10.29'
 --- Unduh kode sumber nodejs
 $ wget http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION.tar.gz
 
---- Extraks nodejs 
+--- Extraks nodejs
 $ tar xvfz node-v$NODE_VERSION.tar.gz
 
 --- Masuk ke dalam direktori hasil extraks nodejs
@@ -35,15 +35,15 @@ $ cd ~/
 $ rm node-v$NODE_VERSION.tar.gz
 $ rm -rf node-v$NODE_VERSION
 
---- Tentukan nama basis data yang akan digunakan, contoh, untuk menggunakan basis data bernama simaya, 
+--- Tentukan nama basis data yang akan digunakan, contoh, untuk menggunakan basis data bernama simaya,
 perintahnya adalah:
 $ export DB=simaya
 
 --- Unduh kode sumber nodejs
-$ npm install simaya 
+$ npm install simaya
 
---- Masuk ke dalam direktori instalasi 
-$ cd simaya 
+--- Masuk ke dalam direktori instalasi
+$ cd simaya
 
 --- Untuk menguji jalannya aplikasi, jalankan :
 $ node app.js
@@ -71,12 +71,12 @@ while($1);do
   if [ -f /tmp/node-master-quit ];then
     exit
   fi
-  LOG=`date +'%Y%m%d%H%M%S'`.log  
+  LOG=`date +'%Y%m%d%H%M%S'`.log
   echo $LOG > app.log
   nohup $HOME/local/bin/node $HOME/simaya/app.js > $HOME/simaya/nohup-$LOG
 done
 
---- Ubah permisi script untuk bisa dieksekusi 
+--- Ubah permisi script untuk bisa dieksekusi
 $ chmod +x simaya.sh
 
 --- Jalankan siMAYA
@@ -86,12 +86,12 @@ $ nohup ./simaya.sh &
 $ crontab -e
 
 --- Tambahkan script berikut pada baris paling bawah
-@reboot /bin/sh $HOME/simaya/simaya.sh 
+@reboot /bin/sh $HOME/simaya/simaya.sh
 
 --- Untuk mengakses, masukkan dibrowser Anda:
 http://localhost:3000/
 atau
-http://alamatip:3000/ 
+http://alamatip:3000/
 
 
 === Konfigurasi reverse proxy dengan squid agar aplikasi bisa dipanggil dengan http://namadomain atau http://alamatip
