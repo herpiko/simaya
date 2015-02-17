@@ -17,10 +17,10 @@ Letter = module.exports = function(app) {
     , _ = require("lodash")
     ;
 
-  /* var dispositionController = null; */
-  /* if (typeof(Disposition) === "undefined") { */
-  var dispositionController = require("../controller/disposition.js")(app)
-  /* } */
+  var dispositionController = null;
+  if (typeof(Disposition) === "undefined") {
+    dispositionController = require("../controller/disposition.js")(app)
+  }
 
   var populateReceivingOrganizations = function(source, data, cb) {
    // Get all organizations
@@ -1244,16 +1244,17 @@ Letter = module.exports = function(app) {
                   }
                 }
                 if (req.api) {
-                  res(res);
+                  res(vals);
                 } else {
                   utils.render(req, res, template, vals, "base-authenticated");
                 }
               })
             } else {
+              var dispositionController = require("../controller/disposition.js")(app);
               dispositionController.listOutgoingBase(req, res, {}, function(req, res, output) {
                 vals.dispositionsList = output;
                 if (req.api) {
-                  res(res);
+                  res(vals);
                 } else {
                   utils.render(req, res, template, vals, "base-authenticated");
                 }

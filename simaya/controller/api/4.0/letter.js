@@ -235,7 +235,7 @@ module.exports = function(app){
       res.send(obj);
     });
   }
-  var outgoingCancel_ = function (req, res) {
+  var outgoingCancel = function (req, res) {
     req.api = true;
     var obj = {
       meta : {},
@@ -247,7 +247,8 @@ module.exports = function(app){
         obj.meta.errorMessage = "Letters Not Found";
         return res.send(obj.meta.code, obj);
       }
-      result.forEach(function(item){
+      console.log(result);
+      result.letters.forEach(function(item){
         console.log(item);
         // trim the objects
         data = {
@@ -264,7 +265,7 @@ module.exports = function(app){
     });
   }
   
-  var outgoingCancel = function (req, res) {
+  var outgoingCancel_ = function (req, res) {
     req.api = true;
     var search = {
       $or: [
@@ -294,17 +295,18 @@ module.exports = function(app){
         obj.meta.errorMessage = "Letters Not Found";
         return res.send(obj.meta.code, obj);
       }
-      result.data.forEach(function(item){
-        // trim the objects
-        data = {
-          _id : item._id,
-          date : item.creationDate,
-          recipients : item.recipients,
-          title : item.title,
-          sender : item.sender
-        } 
-        obj.data.push(data);
-      });
+      console.log(result);
+      /* result.data.forEach(function(item){ */
+      /*   // trim the objects */
+      /*   data = { */
+      /*     _id : item._id, */
+      /*     date : item.creationDate, */
+      /*     recipients : item.recipients, */
+      /*     title : item.title, */
+      /*     sender : item.sender */
+      /*   } */ 
+      /*   obj.data.push(data); */
+      /* }); */
       res.send(obj);
     });
   }
