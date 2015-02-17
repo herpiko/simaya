@@ -17,10 +17,10 @@ Letter = module.exports = function(app) {
     , _ = require("lodash")
     ;
 
-  var dispositionController = null;
-  if (typeof(Disposition) === "undefined") {
-    dispositionController = require("../controller/disposition.js")(app)
-  }
+  /* var dispositionController = null; */
+  /* if (typeof(Disposition) === "undefined") { */
+  var dispositionController = require("../controller/disposition.js")(app)
+  /* } */
 
   var populateReceivingOrganizations = function(source, data, cb) {
    // Get all organizations
@@ -2712,6 +2712,7 @@ Letter = module.exports = function(app) {
     , viewLetter: viewLetter
     , viewSingleLetter: viewSingleLetter
     , downloadAttachment: downloadAttachment
+    , list: list
     , listIncoming: listIncoming
     , listIncomingBase: listIncomingBase
     , listCc: listCc

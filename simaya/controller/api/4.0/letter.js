@@ -235,6 +235,34 @@ module.exports = function(app){
       res.send(obj);
     });
   }
+  var outgoingCancel_ = function (req, res) {
+    req.api = true;
+    var obj = {
+      meta : {},
+      data : []
+    }
+    letterWeb.listOutgoingCancel(req, function(result){
+      if (result == null) {
+        obj.meta.code = 404;
+        obj.meta.errorMessage = "Letters Not Found";
+        return res.send(obj.meta.code, obj);
+      }
+      result.forEach(function(item){
+        console.log(item);
+        // trim the objects
+        data = {
+          _id : item._id,
+          date : moment(item.creationDate).format("DD MMM YYYY"),
+          recipients : item.recipients,
+          title : item.title,
+          sender : item.sender,
+          readStates : item.readStates
+        } 
+        obj.data.push(data);
+      });
+      res.send(obj);
+    });
+  }
   
   var outgoingCancel = function (req, res) {
     req.api = true;
