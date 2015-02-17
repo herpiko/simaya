@@ -264,52 +264,6 @@ module.exports = function(app){
       res.send(obj);
     });
   }
-  
-  var outgoingCancel_ = function (req, res) {
-    req.api = true;
-    var search = {
-      $or: [
-        { originator: req.session.currentUser},
-        { reviewers:
-          { $in: [req.session.currentUser] }
-        }
-      ],
-      status: letter.Stages.DEMOTED,
-      creation: "normal",
-    }
-    search.page = req.query["page"] || 1;
-    search.limit = 20;
-    search.sort = {
-      type : "",
-      dir : 0
-    };
-    var obj = {
-      meta : {},
-      data : []
-    }
-    vals = {};
-    letterWeb.list(vals, "letter-outgoing-cancel", {search: search}, req, function(result){
-      if (result == null) {
-        
-        obj.meta.code = 404;
-        obj.meta.errorMessage = "Letters Not Found";
-        return res.send(obj.meta.code, obj);
-      }
-      console.log(result);
-      /* result.data.forEach(function(item){ */
-      /*   // trim the objects */
-      /*   data = { */
-      /*     _id : item._id, */
-      /*     date : item.creationDate, */
-      /*     recipients : item.recipients, */
-      /*     title : item.title, */
-      /*     sender : item.sender */
-      /*   } */ 
-      /*   obj.data.push(data); */
-      /* }); */
-      res.send(obj);
-    });
-  }
 
   /**
    * @api {get} /letter/read/:id Read a letter or agenda
