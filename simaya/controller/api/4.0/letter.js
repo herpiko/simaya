@@ -185,7 +185,6 @@ module.exports = function(app){
         return res.send(obj.meta.code, obj);
       }
       result.forEach(function(item){
-        console.log(item);
         // trim the objects
         data = {
           _id : item._id,
@@ -247,9 +246,7 @@ module.exports = function(app){
         obj.meta.errorMessage = "Letters Not Found";
         return res.send(obj.meta.code, obj);
       }
-      console.log(result);
       result.letters.forEach(function(item){
-        console.log(item);
         // trim the objects
         data = {
           _id : item._id,
@@ -911,14 +908,12 @@ module.exports = function(app){
   
   }
   var attachmentMetadata = function(req, res) {
-    console.log("attachmentMetadata");
     req.api = true;
     letter.getDocumentMetadata(req.params.id, res);
   }
 
   var attachmentRender = function(req, res) {
     data = req.params[0].split("/");
-    console.log(data);
     letter.renderDocumentPageBase64(data[0], parseInt(data[1]), res);
   }
 
