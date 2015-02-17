@@ -233,7 +233,7 @@ module.exports = function(app) {
       contacts.getInfo(req.query.id, function(item) {
         if (item && item.originator != me) {
           contacts.establish(req.query.id, function(v) {
-            if (v.errors) {
+            if (Object.keys(v.errors).length > 0) {
               res.send(400, {
                 meta: {
                   code: 400,
