@@ -32,14 +32,14 @@ module.exports = function(app) {
 
   // User (re-)connects, called on every page
   app.io.route('ready', function(req) {
-    if (req.session && req.session.currentUser) {
-      var user = req.session.currentUser;
+    /* console.log(req); */
+    if (req.session) {
+      var user = req.session.currentUser || req.data.currentUser;
       sockets[user] = req.io.socket; 
 
       updatePresence(user, "online");
     }
   })
-
 
   // Update presence-status
   var updatePresence = function(me, status) {
